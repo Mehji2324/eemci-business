@@ -1,0 +1,496 @@
+:root {
+    --primary: #4f46e5;
+    --primary-hover: #4338ca;
+    --secondary: #0ea5e9;
+    --accent: #10b981;
+    --bg-main: #f8fafc;
+    --sidebar-bg: #1e293b;
+    --card-bg: rgba(255, 255, 255, 0.8);
+    --glass-border: rgba(255, 255, 255, 0.3);
+    --text-main: #1e293b;
+    --text-muted: #64748b;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+body {
+    background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+    color: var(--text-main);
+    min-height: 100vh;
+}
+
+/* Glassmorphism Utility */
+.glass {
+    background: var(--card-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+}
+
+/* Dashboard Structure */
+.dashboard-wrapper {
+    display: flex;
+}
+
+aside {
+    width: 280px;
+    height: 100vh;
+    background: var(--sidebar-bg);
+    padding: 2rem 1.5rem;
+    position: fixed;
+    color: white;
+    z-index: 100;
+}
+
+.sidebar-logo {
+    width: 160px;
+    display: block;
+    margin: 0 auto 2.5rem;
+    filter: drop-shadow(0 4px 12px rgba(0,0,0,0.1));
+    transition: transform 0.3s ease;
+}
+
+.sidebar-logo:hover {
+    transform: scale(1.05);
+}
+
+.login-logo {
+    width: 180px;
+    margin-bottom: 1.5rem;
+    filter: drop-shadow(0 4px 20px rgba(0,0,0,0.08));
+}
+
+aside li {
+    list-style: none;
+    padding: 1rem 1.25rem;
+    margin-bottom: 0.5rem;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 500;
+    color: #94a3b8;
+}
+
+aside li:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: white;
+}
+
+aside li.active {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+}
+
+main {
+    flex: 1;
+    margin-left: 280px;
+    padding: 2rem 3rem;
+}
+
+header {
+    margin-bottom: 3rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.welcome-box h1 {
+    font-size: 2rem;
+    font-weight: 800;
+    background: linear-gradient(to right, #1e293b, #475569);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Stats Cards */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+}
+
+.stat-card {
+    padding: 1.5rem;
+    border-radius: 20px;
+}
+
+.stat-card h4 {
+    color: var(--text-muted);
+    font-size: 0.875rem;
+    margin-bottom: 0.5rem;
+}
+
+.stat-card .value {
+    font-size: 1.75rem;
+    font-weight: 800;
+}
+
+/* Main Content Cards */
+.content-card {
+    border-radius: 24px;
+    padding: 2.5rem;
+    margin-bottom: 2rem;
+}
+
+.content-card h3 {
+    font-size: 1.5rem;
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Tables */
+.table-container {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th {
+    text-align: left;
+    padding: 1rem;
+    color: var(--text-muted);
+    font-weight: 600;
+    border-bottom: 2px solid #f1f5f9;
+}
+
+td {
+    padding: 1.25rem 1rem;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+tr:last-child td {
+    border-bottom: none;
+}
+
+/* Course Cards */
+.course-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 2rem;
+}
+
+.course-item {
+    border-radius: 20px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255,255,255,0.5);
+}
+
+.course-item:hover {
+    transform: translateY(-8px);
+    background: white;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+/* Forms */
+input, select {
+    width: 100%;
+    padding: 0.75rem 1.25rem;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    background: #f8fafc;
+    margin-bottom: 1.25rem;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+input:focus {
+    border-color: var(--primary);
+}
+
+/* --- Advanced Button System --- */
+button, .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 1.5rem;
+    border-radius: 12px;
+    font-size: 0.9375rem;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: none;
+    outline: none;
+    gap: 8px;
+    user-select: none;
+    white-space: nowrap;
+}
+
+/* Primary Action (Login, Register, Upload) */
+button[type="submit"], .btn-primary, button.primary {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+}
+
+button[type="submit"]:hover, .btn-primary:hover, button.primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(79, 70, 229, 0.4);
+    filter: brightness(1.1);
+}
+
+button[type="submit"]:active, .btn-primary:active, button.primary:active {
+    transform: translateY(0);
+}
+
+/* Danger Action (Delete, Cancel) */
+.btn-danger, button.danger, button[onclick*="delete"] {
+    background: #fff1f2;
+    color: var(--danger);
+    border: 1px solid #fecaca;
+}
+
+.btn-danger:hover, button.danger:hover, button[onclick*="delete"]:hover {
+    background: var(--danger);
+    color: white;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+}
+
+/* Logout Button Special Style */
+.logout-btn {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(8px);
+    color: var(--text-main);
+    border: 1px solid var(--glass-border);
+    padding: 0.625rem 1.25rem;
+}
+
+.logout-btn:hover {
+    background: var(--danger);
+    color: white;
+    border-color: var(--danger);
+}
+
+/* Sidebar/Navigation Buttons (li elements acting as buttons) */
+aside li {
+    position: relative;
+    overflow: hidden;
+}
+
+aside li::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 4px;
+    height: 0;
+    background: white;
+    border-radius: 0 4px 4px 0;
+    transition: height 0.3s ease;
+}
+
+aside li.active::after {
+    height: 60%;
+}
+
+/* --- Login Page Specific Button Fix --- */
+.login-box button {
+    width: 100%;
+    margin-top: 1rem;
+    height: 52px;
+}
+
+/* --- Deep Dark Theme & Auth Styles --- */
+.auth-page {
+    background: radial-gradient(circle at top right, #1e1b4b, #020617);
+    color: #f8fafc;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.login-box {
+    width: 100%;
+    max-width: 400px; /* Small and compact */
+    padding: 3rem 2.5rem;
+    background: rgba(30, 41, 59, 0.7);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 32px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    text-align: center;
+    animation: authFadeIn 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes authFadeIn {
+    from { opacity: 0; transform: scale(0.95) translateY(10px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.login-box h1 {
+    color: #f8fafc;
+    font-size: 1.75rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+}
+
+.login-box p {
+    color: #94a3b8;
+    margin-bottom: 2rem;
+    font-size: 0.9375rem;
+}
+
+.login-box input, .login-box select {
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #f8fafc;
+}
+
+.login-box input:focus, .login-box select:focus {
+    background: rgba(15, 23, 42, 0.8);
+    border-color: #6366f1;
+}
+
+.login-box a {
+    color: #0ea5e9;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.login-box a:hover {
+    text-decoration: underline;
+}
+
+/* --- Humanized Elements --- */
+.user-profile-widget {
+    margin-bottom: 2rem;
+    text-align: center;
+    padding: 1rem;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.avatar {
+    width: 64px;
+    height: 64px;
+    background: linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%);
+    border-radius: 50%;
+    margin: 0 auto 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: white;
+    border: 3px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+}
+
+.greeting-text {
+    font-size: 0.875rem;
+    color: var(--text-dim);
+}
+
+/* Softer Card & Shadow Updates */
+.content-card {
+    border-radius: 30px; /* More organic roundness */
+}
+
+/* Friendly Notifications */
+.notification.success {
+    border-left: 5px solid var(--accent);
+    color: #065f46;
+}
+
+.notification.error {
+    border-left: 5px solid var(--danger);
+    color: #991b1b;
+}
+
+/* --- Utility Classes --- */
+.hidden { display: none !important; }
+
+/* Admin Dashboard Specifics */
+.custom-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    width: 100%;
+    max-width: 500px;
+    padding: 2rem;
+    border-radius: 20px;
+}
+
+.top-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 200;
+}
+
+.user-meta {
+    display: flex;
+    align-items: center;
+}
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    background: var(--primary);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+.dashboard-container {
+    padding-top: 80px;
+    display: flex;
+}
+
+.sidebar {
+    width: 250px;
+    height: calc(100vh - 80px);
+    position: fixed;
+    left: 10px;
+    top: 90px;
+    border-radius: 20px;
+    padding: 1.5rem;
+}
+
+.sidebar-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.content-area {
+    margin-left: 280px;
+    padding: 2rem;
+    width: 100%;
+}

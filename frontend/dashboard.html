@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EEMCI Platform - Dashboard</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="dashboard-wrapper">
+        <aside>
+            <img src="logo.webp" alt="EEMCI Logo" class="sidebar-logo">
+            
+            <!-- User Profile Widget -->
+            <div class="user-profile-widget">
+                <div class="avatar" id="userAvatar">U</div>
+                <div class="greeting-text" id="timeGreeting">Good day,</div>
+                <div style="font-weight: 700; font-size: 1rem;" id="userNameSidebar">User Name</div>
+            </div>
+
+            <h2 id="roleTitle">Dashboard</h2>
+            <ul id="sidebarMenu">
+                <!-- Menu items injected by JS -->
+            </ul>
+        </aside>
+
+        <main>
+            <header>
+                <div class="welcome-box">
+                    <h1 id="welcomeText">Welcome</h1>
+                    <p id="currentDate"></p>
+                </div>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            </header>
+
+            <!-- Stats Overview (Dynamic) -->
+            <div id="statsOverview" class="stats-grid">
+                <!-- Injected via JS -->
+            </div>
+
+            <!-- Global Mailbox Section -->
+            <div id="mailboxSection" class="section-content hidden">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h3>📩 Internal Mailbox</h3>
+                    <button class="btn btn-primary" onclick="showComposeModal()"><i class="fas fa-paper-plane"></i> New Message</button>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="glass p-3 mb-3">
+                            <ul class="nav flex-column nav-pills" id="mailTabs">
+                                <li class="nav-item">
+                                    <button class="nav-link active w-100 text-start" onclick="loadInbox()"><i class="fas fa-inbox me-2"></i> Inbox</button>
+                                </li>
+                                <li class="nav-item mt-2">
+                                    <button class="nav-link w-100 text-start" onclick="loadSent()"><i class="fas fa-share me-2"></i> Sent</button>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="glass p-3" style="min-height: 400px;" id="mailContent">
+                            <div id="mailList" class="list-group list-group-flush">
+                                <!-- Messages will be loaded here -->
+                            </div>
+                            <div id="messageView" class="hidden">
+                                <!-- Full message view -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Student Content -->
+            <div id="studentSection" class="hidden">
+                <!-- Overview Section -->
+                <div id="studentOverview" class="section-content">
+                    <div class="content-card glass">
+                        <h3>🎓 Student Profile</h3>
+                        <div class="profile-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                            <div>
+                                <p style="color: var(--text-muted)">Department</p>
+                                <p><strong id="studentDeptDisplay" style="font-size: 1.2rem;"></strong></p>
+                            </div>
+                            <div>
+                                <p style="color: var(--text-muted)">Academic Email</p>
+                                <p><strong id="studentEmailDisplay" style="font-size: 1.1rem; color: var(--primary);"></strong></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Grades Section -->
+                <div id="studentGrades" class="section-content hidden">
+                    <div class="content-card glass">
+                        <h3>📊 Academic Performance</h3>
+                        <div class="table-container">
+                            <table id="gradesTable" class="table table-hover align-middle">
+                                <thead class="table-light"><tr><th>Module</th><th>Note / 20</th><th>Status</th></tr></thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Study Schedule Section -->
+                <div id="studentStudySchedule" class="section-content hidden">
+                    <div class="content-card glass">
+                        <h3>🗓️ Weekly Study Plan</h3>
+                        <div class="table-container">
+                            <table id="scheduleTable" class="table table-hover align-middle">
+                                <thead class="table-light"><tr><th>Day</th><th>Time</th><th>Module</th></tr></thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Exam Schedule Section -->
+                <div id="studentExamSchedule" class="section-content hidden">
+                    <div class="content-card glass">
+                        <h3>📝 Examination Schedule</h3>
+                        <div class="table-container">
+                            <table id="examScheduleTable" class="table table-hover align-middle">
+                                <thead class="table-light"><tr><th>Date</th><th>Time</th><th>Module</th></tr></thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Courses Section -->
+                <div id="studentCourses" class="section-content hidden">
+                    <h3>📚 My Courses</h3>
+                    <div id="studentCoursesList" class="course-grid"></div>
+                </div>
+
+                <!-- Events & Plans Section -->
+                <div id="studentEvents" class="section-content hidden">
+                    <h3>📅 School Events & Plans</h3>
+                    <div id="eventsContainer" class="course-grid"></div>
+                </div>
+            </div>
+
+            <!-- Professor Content -->
+            <div id="professorSection" class="hidden">
+                <!-- Quick Stats for Professor -->
+                <div id="profStats" class="stats-grid">
+                    <div class="stat-card glass">
+                        <h4>Assigned Students</h4>
+                        <div class="value" id="profStudentCount">0</div>
+                    </div>
+                    <div class="stat-card glass">
+                        <h4>Courses Uploaded</h4>
+                        <div class="value" id="profCourseCount">0</div>
+                    </div>
+                    <div class="stat-card glass">
+                        <h4>Tools</h4>
+                        <div style="display: flex; gap: 10px; margin-top: 10px;">
+                            <button class="primary" onclick="exportData('grades')">Export Grades</button>
+                            <button class="primary" onclick="exportData('attendance')">Export Attendance</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                    <!-- Attendance Section -->
+                    <div class="content-card glass">
+                        <h3>✅ Mark Attendance</h3>
+                        <form id="attendanceForm">
+                            <select id="attnStudentSelect" required><option value="">Select Student</option></select>
+                            <input type="text" id="attnModule" placeholder="Module / Class Name" required>
+                            <select id="attnStatus" required>
+                                <option value="present">Present</option>
+                                <option value="absent">Absent</option>
+                                <option value="retard">Retard</option>
+                            </select>
+                            <button type="submit" class="primary">Record Presence</button>
+                        </form>
+                    </div>
+
+                    <!-- Grade Section -->
+                    <div class="content-card glass">
+                        <h3>📝 Post Grades / Exams</h3>
+                        <form id="gradeForm">
+                            <select id="studentSelect" required><option value="">Select Student</option></select>
+                            <input type="text" id="gradeModule" placeholder="Module Name" required>
+                            <input type="number" step="0.01" id="gradeNote" placeholder="Score / 20" required>
+                            <select id="gradeType">
+                                <option value="exam">Final Exam</option>
+                                <option value="assignment">Assignment / CC</option>
+                            </select>
+                            <button type="submit" class="primary">Submit Grade</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Course Upload Section -->
+                <div class="content-card glass">
+                    <h3>📤 Share Resources</h3>
+                    <form id="uploadForm" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                        <div>
+                            <input type="text" id="courseTitle" placeholder="Document Title (e.g. Lec 1: Networking)" required>
+                            <select id="courseDepartment" required>
+                                <option value="">Target Department</option>
+                                <option value="Développement Informatique">Développement Informatique</option>
+                                <option value="Systèmes et Réseaux">Systèmes et Réseaux</option>
+                            </select>
+                        </div>
+                        <div>
+                            <input type="file" id="courseFile" required>
+                            <button type="submit" class="primary" style="width: 100%;">Upload to Platform</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Admin Content -->
+            <div id="adminSection" class="hidden">
+                <!-- Statistics Tab -->
+                <div id="stats-mgmt" class="section-content hidden">
+                    <div class="content-card glass">
+                        <h3>📈 Platform Overview</h3>
+                        <div id="statsCards" class="row g-4 mb-4">
+                            <!-- Stats injected via JS -->
+                        </div>
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <div class="glass p-3">
+                                    <h5 class="mb-3">Recent Grades</h5>
+                                    <div id="recentGradesList" class="small"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="glass p-3">
+                                    <h5 class="mb-3">Recent Attendance</h5>
+                                    <div id="recentAttendanceList" class="small"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- User Management Tab -->
+                <div id="user-mgmt" class="section-content">
+                    <div class="content-card glass">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h3>👥 User Management</h3>
+                            <button onclick="showAddUserForm()" class="btn btn-primary"><i class="fas fa-plus me-2"></i> Add New User</button>
+                        </div>
+                        <div class="table-container">
+                            <table id="usersTable" class="table table-hover align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Academic Email</th>
+                                        <th>Role</th>
+                                        <th>Password</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hidden Add User Modal -->
+                <div id="addUserModal" class="custom-modal hidden">
+                    <div class="modal-content glass" style="max-width: 500px;">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h4><i class="fas fa-user-plus me-2"></i> Create Account</h4>
+                            <button class="btn btn-sm btn-outline-secondary" onclick="hideAddUserForm()"><i class="fas fa-times"></i></button>
+                        </div>
+                        <form id="userForm">
+                            <input type="text" id="userName" placeholder="Full Name" required oninput="previewEmail()">
+                            
+                            <div id="emailPreviewBox" class="alert alert-info py-2 px-3 small d-none mb-3">
+                                <i class="fas fa-info-circle me-1"></i> Generated Email: <strong id="emailPreviewText"></strong>
+                            </div>
+
+                            <select id="userRole" onchange="toggleGroupInput(); previewEmail()" class="form-select mb-3">
+                                <option value="student">Student</option>
+                                <option value="professor">Professor</option>
+                                <option value="admin">Admin</option>
+                            </select>
+
+                            <div id="deptWrapper" class="mb-3">
+                                <select id="userDept" class="form-select">
+                                    <option value="">Select Department</option>
+                                    <option value="Développement Informatique">Développement Informatique</option>
+                                    <option value="Systèmes et Réseaux">Systèmes et Réseaux</option>
+                                </select>
+                            </div>
+
+                            <div id="groupInputWrapper" class="mb-3">
+                                <input type="text" id="userGroup" placeholder="Group (e.g. Group A, CP1...)" class="form-control">
+                            </div>
+
+                            <input type="password" id="userPassword" placeholder="Custom Password (Optional)" class="form-control mb-4">
+                            
+                            <button type="submit" class="btn btn-primary w-100 py-2">Create & Generate Email</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Compose Message Modal -->
+    <div id="composeModal" class="custom-modal hidden">
+        <div class="modal-content glass" style="max-width: 600px;">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4><i class="fas fa-edit me-2"></i> New Message</h4>
+                <button class="btn btn-sm btn-outline-secondary" onclick="hideComposeModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <form id="composeForm">
+                <div class="mb-3">
+                    <label class="form-label">Recipient</label>
+                    <select id="msgRecipient" class="form-select" required>
+                        <option value="">Select recipient...</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Subject</label>
+                    <input type="text" id="msgSubject" class="form-control" placeholder="Brief summary of your message">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Message</label>
+                    <textarea id="msgContent" class="form-control" rows="6" placeholder="Write your message here..." required></textarea>
+                </div>
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary flex-grow-1"><i class="fas fa-paper-plane me-1"></i> Send Message</button>
+                    <button type="button" class="btn btn-secondary" onclick="hideComposeModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

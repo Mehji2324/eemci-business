@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EEMCI – Faculty Dashboard</title>
+    <meta name="description" content="EEMCI Professor Portal – Upload notes, manage attendance and grades.">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="prof-style.css">
+</head>
+<body>
+<div class="dashboard-wrapper">
+
+    <!-- ═══════════ SIDEBAR ═══════════ -->
+    <aside id="sidebar">
+        <img src="logo.webp" alt="EEMCI" class="sidebar-logo">
+
+        <div class="prof-widget">
+            <div class="prof-avatar" id="profAvatar">P</div>
+            <div class="prof-name"  id="profName">Professor</div>
+            <div class="prof-email" id="profEmail">—</div>
+            <div class="prof-dept"  id="profDept">—</div>
+        </div>
+
+        <nav>
+            <ul id="sidebarMenu">
+                <li class="nav-item active" data-section="secOverview"      onclick="switchTab(this)">
+                    <span class="nav-icon">🏠</span> Overview
+                </li>
+                <li class="nav-item" data-section="secUpload"       onclick="switchTab(this)">
+                    <span class="nav-icon">📤</span> Upload Notes
+                </li>
+                <li class="nav-item" data-section="secAttendance"   onclick="switchTab(this)">
+                    <span class="nav-icon">✅</span> Attendance
+                </li>
+                <li class="nav-item" data-section="secGrades"       onclick="switchTab(this)">
+                    <span class="nav-icon">📊</span> Grades
+                </li>
+                <li class="nav-item" data-section="secRecords"      onclick="switchTab(this)">
+                    <span class="nav-icon">📋</span> Records
+                </li>
+                <li class="nav-item" data-section="secMessages"     onclick="switchTab(this)" style="display:flex; justify-content:space-between; align-items:center;">
+                    <span><span class="nav-icon">📩</span> Mailbox</span>
+                    <span id="msgBadge" class="badge bg-danger rounded-pill hidden" style="font-size: 0.7rem;">0</span>
+                </li>
+            </ul>
+        </nav>
+
+        <button class="logout-btn" onclick="logout()">⏻ Sign Out</button>
+    </aside>
+
+    <!-- ═══════════ MAIN ═══════════ -->
+    <main>
+        <header class="dash-header">
+            <div>
+                <h1 id="welcomeText">Good day, Professor</h1>
+                <p id="currentDate" class="date-text"></p>
+            </div>
+            <div class="header-badges">
+                <span class="badge-role">Faculty</span>
+            </div>
+        </header>
+
+        <!-- ── OVERVIEW ── -->
+        <section id="secOverview" class="dash-section">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">👥</div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="statStudents">—</div>
+                        <div class="stat-label">Total Students</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">📚</div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="statCourses">—</div>
+                        <div class="stat-label">Notes Uploaded</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">📝</div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="statGrades">—</div>
+                        <div class="stat-label">Grades Posted</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">📅</div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="statAttendance">—</div>
+                        <div class="stat-label">Attendance Records</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent courses -->
+            <div class="card-panel">
+                <div class="panel-header">
+                    <h3>📚 Recently Uploaded Notes</h3>
+                    <button class="btn-outline" onclick="switchTabById('secUpload')">+ Upload New</button>
+                </div>
+                <div id="recentCoursesList" class="courses-grid">
+                    <p class="empty-msg">No notes uploaded yet.</p>
+                </div>
+            </div>
+
+            <!-- Export tools -->
+            <div class="card-panel">
+                <div class="panel-header">
+                    <h3>📥 Export Data</h3>
+                </div>
+                <div class="export-row">
+                    <button class="btn-export" onclick="exportData('grades')">
+                        ⬇️ Export Grades (.xlsx)
+                    </button>
+                    <button class="btn-export secondary" onclick="exportData('attendance')">
+                        ⬇️ Export Attendance (.xlsx)
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ── MESSAGES ── -->
+        <section id="secMessages" class="dash-section hidden">
+            <div class="card-panel">
+                <div class="panel-header">
+                    <h3>📩 Internal Mailbox</h3>
+                    <button class="btn-primary" style="width:auto; padding: 0.5rem 1.25rem;" onclick="showComposeModal()"><i class="fas fa-paper-plane me-2"></i> New Message</button>
+                </div>
+                
+                <div class="row mt-3">
+                    <div class="col-md-3">
+                        <div class="list-group">
+                            <button class="list-group-item list-group-item-action active" id="btnInbox" onclick="loadInbox()">
+                                <i class="fas fa-inbox me-2"></i> Inbox
+                            </button>
+                            <button class="list-group-item list-group-item-action" id="btnSent" onclick="loadSent()">
+                                <i class="fas fa-share me-2"></i> Sent
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-md-9">
+                        <div id="mailList" class="list-group list-group-flush border rounded overflow-hidden">
+                            <!-- Messages will be loaded here -->
+                        </div>
+                        <div id="messageView" class="p-4 border rounded hidden">
+                            <!-- Full message view -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ── UPLOAD NOTES ── -->
+        <section id="secUpload" class="dash-section hidden">
+            <div class="card-panel">
+                <div class="panel-header">
+                    <h3>📤 Upload Exam Notes / Course Materials</h3>
+                </div>
+                <form id="uploadForm" class="upload-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="courseTitle">Document Title</label>
+                            <input type="text" id="courseTitle" placeholder="e.g. Exam Notes – Chapter 3" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="courseDepartment">Target Department</label>
+                            <select id="courseDepartment" required>
+                                <option value="">Select Department</option>
+                                <option value="Développement Informatique">Développement Informatique</option>
+                                <option value="Systèmes et Réseaux">Systèmes et Réseaux</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="courseFile">File (PDF, DOCX, PPTX, max 25 MB)</label>
+                        <div class="file-drop-zone" id="dropZone">
+                            <div class="drop-icon">📁</div>
+                            <p>Drag & drop your file here or <span>browse</span></p>
+                            <input type="file" id="courseFile" accept=".pdf,.docx,.pptx,.xlsx,.zip,.png,.jpg" required>
+                            <div id="fileNameDisplay" class="file-name-display hidden"></div>
+                        </div>
+                    </div>
+                    <button type="submit" id="uploadBtn" class="btn-primary">
+                        <span id="uploadBtnText">Upload to Platform</span>
+                    </button>
+                </form>
+
+                <div class="divider"></div>
+                <h4 style="margin-bottom:1rem;">My Uploaded Notes</h4>
+                <div id="myCoursesList" class="courses-grid">
+                    <p class="empty-msg">No notes uploaded yet.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ── ATTENDANCE ── -->
+        <section id="secAttendance" class="dash-section hidden">
+            <div class="card-panel">
+                <div class="panel-header">
+                    <h3>✅ Mark Attendance — Bulk Session</h3>
+                </div>
+
+                <div class="form-row" style="margin-bottom:1.5rem;">
+                    <div class="form-group">
+                        <label for="bulkModule">Module / Class</label>
+                        <input type="text" id="bulkModule" placeholder="e.g. Algorithmes — Séance 5">
+                    </div>
+                    <div class="form-group">
+                        <label for="bulkDate">Date</label>
+                        <input type="date" id="bulkDate">
+                    </div>
+                    <div class="form-group">
+                        <label for="bulkGroup">Filter by Group</label>
+                        <select id="bulkGroup" onchange="filterAttendanceList()">
+                            <option value="">All Groups</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="attendance-controls">
+                    <button class="btn-mark present" onclick="markAll('present')">✅ Mark All Present</button>
+                    <button class="btn-mark absent"  onclick="markAll('absent')">❌ Mark All Absent</button>
+                </div>
+
+                <div id="attendanceList" class="attendance-table-wrap">
+                    <p class="empty-msg">Loading students…</p>
+                </div>
+
+                <button id="saveAttendanceBtn" class="btn-primary" style="margin-top:1.5rem;" onclick="saveBulkAttendance()">
+                    💾 Save Attendance Session
+                </button>
+            </div>
+        </section>
+
+        <!-- ── GRADES ── -->
+        <section id="secGrades" class="dash-section hidden">
+            <div class="card-panel">
+                <div class="panel-header">
+                    <h3>📊 Post Exam / Assignment Grades</h3>
+                </div>
+                <form id="gradeForm" class="upload-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="gradeStudentSelect">Student</label>
+                            <select id="gradeStudentSelect" required>
+                                <option value="">Select Student</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="gradeModule">Module</label>
+                            <input type="text" id="gradeModule" placeholder="e.g. Base de Données" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="gradeNote">Score (0–20)</label>
+                            <input type="number" id="gradeNote" min="0" max="20" step="0.25" placeholder="14.5" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="gradeType">Type</label>
+                            <select id="gradeType">
+                                <option value="exam">Final Exam</option>
+                                <option value="assignment">Assignment / CC</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-primary">Submit Grade</button>
+                </form>
+            </div>
+        </section>
+
+        <!-- ── RECORDS ── -->
+        <section id="secRecords" class="dash-section hidden">
+            <div class="card-panel">
+                <div class="panel-header">
+                    <h3>📋 Attendance Records</h3>
+                    <div style="display:flex;gap:.75rem;">
+                        <input type="text" id="filterModule" placeholder="Filter by module…" style="width:220px;margin:0;" oninput="filterRecords()">
+                        <input type="date"  id="filterDate"  style="width:175px;margin:0;" onchange="filterRecords()">
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table id="recordsTable" class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Student</th>
+                                <th>Group</th>
+                                <th>Module</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recordsTableBody">
+                            <tr><td colspan="5" class="empty-msg">Loading…</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+    </main>
+</div>
+
+<!-- Compose Message Modal -->
+<div id="composeModal" class="custom-modal hidden">
+    <div class="modal-content glass" style="max-width: 600px;">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4><i class="fas fa-edit me-2"></i> New Message</h4>
+            <button class="btn btn-sm btn-outline-secondary" onclick="hideComposeModal()"><i class="fas fa-times"></i></button>
+        </div>
+        <form id="composeForm">
+            <div class="mb-3">
+                <label class="form-label">Recipient</label>
+                <select id="msgRecipient" class="form-select" required>
+                    <option value="">Select recipient...</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Subject</label>
+                <input type="text" id="msgSubject" class="form-control" placeholder="Brief summary of your message">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Message</label>
+                <textarea id="msgContent" class="form-control" rows="6" placeholder="Write your message here..." required></textarea>
+            </div>
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary flex-grow-1"><i class="fas fa-paper-plane me-1"></i> Send Message</button>
+                <button type="button" class="btn btn-secondary" onclick="hideComposeModal()">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="prof-script.js"></script>
+</body>
+</html>
