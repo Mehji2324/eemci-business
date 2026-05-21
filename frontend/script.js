@@ -59,14 +59,32 @@ function showNotify(message, type = 'success') {
     }).fire({ icon: type, title: message });
 }
 
+function toggleLoginModal() {
+    const modal = document.getElementById('loginModal');
+    if (modal) modal.classList.toggle('hidden');
+}
+
+// Navbar Scroll Effect
+window.addEventListener('scroll', () => {
+    const nav = document.querySelector('.landing-nav');
+    if (nav) {
+        if (window.scrollY > 50) nav.classList.add('scrolled');
+        else nav.classList.remove('scrolled');
+    }
+});
+
 // Global API Fetch Helper with 401 handling
 async function apiFetch(endpoint, options = {}) {
     const token = sessionStorage.getItem('token');
-    const headers = {
-        'Content-Type': 'application/json',
-        ...(token && { 'Authorization': `Bearer ${token}` }),
-        ...options.headers
-    };
+    
+    // Set default headers
+    const headers = { ...options.headers };
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+    
+    // If body is NOT FormData, default to JSON content-type
+    if (!(options.body instanceof FormData) && !headers['Content-Type']) {
+        headers['Content-Type'] = 'application/json';
+    }
 
     try {
         const response = await fetch(`${API_URL}${endpoint}`, { ...options, headers });

@@ -17,16 +17,34 @@ exports.addUser = asyncHandler(async (req, res) => {
         return res.status(400).json({ success: false, message: 'Name and Role are required' });
     }
 
-    // Generate academic email
+    // Generate academic email with collision handling
     const nameParts = name.trim().toLowerCase().split(/\s+/);
     const firstName = nameParts[0];
     const lastName = nameParts.length > 1 ? nameParts[nameParts.length - 1] : firstName;
     
-    let academicEmail;
+    let baseEmail;
     if (role === 'professor') {
-        academicEmail = `${firstName}.${lastName}.prof@eemci.edu.ma`;
+        baseEmail = `${firstName}.${lastName}.prof`;
+    } else if (role === 'admin') {
+        baseEmail = `${firstName}.${lastName}.admin`;
     } else {
-        academicEmail = `${firstName}.${lastName}@eemci.edu.ma`;
+        baseEmail = `${firstName}.${lastName}`;
+    }
+
+    const domain = role === 'admin' ? '@eemci.com' : '@eemci.edu.ma';
+    let academicEmail = `${baseEmail}${domain}`;
+    
+    // Check for collisions and append number if needed
+    let counter = 1;
+    let exists = true;
+    while (exists) {
+        const [existing] = await db.execute('SELECT id FROM users WHERE email = ?', [academicEmail]);
+        if (existing.length === 0) {
+            exists = false;
+        } else {
+            counter++;
+            academicEmail = `${baseEmail}${counter}${domain}`;
+        }
     }
 
     // Generate standard password

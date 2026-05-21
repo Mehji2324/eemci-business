@@ -37,6 +37,7 @@ exports.addGrade = asyncHandler(async (req, res) => {
         'INSERT INTO grades (student_id, module, note, type) VALUES (?, ?, ?, ?)',
         [student_id, module, gradeValue, type || 'exam']
     );
+
     res.status(201).json({ success: true, message: 'Grade recorded successfully.' });
 });
 

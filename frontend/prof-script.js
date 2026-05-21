@@ -18,6 +18,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
     document.getElementById('currentDate').textContent = new Date().toLocaleDateString('en-US', dateOptions);
 
+    // Set default attendance date to today
+    const bulkDateInput = document.getElementById('bulkDate');
+    if (bulkDateInput) {
+        bulkDateInput.value = new Date().toISOString().split('T')[0];
+    }
+
     // Initialize
     loadProfile();
     loadDashboardData();
@@ -97,13 +103,17 @@ function quickMessage(receiverId) {
 // ─── Data Loading ───
 async function fetchWithAuth(endpoint, options = {}) {
     const token = sessionStorage.getItem('token');
-    if (!options.headers) options.headers = {};
-    if (!(options.body instanceof FormData)) {
-        options.headers['Content-Type'] = 'application/json';
+    
+    // Set default headers
+    const headers = { ...options.headers };
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+    
+    // If body is NOT FormData, default to JSON content-type
+    if (options.body && !(options.body instanceof FormData) && !headers['Content-Type']) {
+        headers['Content-Type'] = 'application/json';
     }
-    options.headers['Authorization'] = `Bearer ${token}`;
 
-    const res = await fetch(`${API_URL}${endpoint}`, options);
+    const res = await fetch(`${API_URL}${endpoint}`, { ...options, headers });
     if (res.status === 401 || res.status === 403) {
         logout();
         throw new Error('Unauthorized');
@@ -435,40 +445,50 @@ function renderAttendanceTable(students) {
     const wrap = document.getElementById('attendanceList');
     if (!wrap) return;
 
-    const tbody = document.createElement('tbody');
+    let rowsHtml = '';
     
     if (students.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="3" class="empty-msg">No students found.</td></tr>';
+        rowsHtml = '<tr><td colspan="3" class="text-center py-4">No students found for this group.</td></tr>';
     } else {
         students.forEach(s => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td><strong>${s.name}</strong></td>
-                <td>${s.group_name}</td>
-                <td>
-                    <div class="status-toggle" data-student-id="${s.id}">
-                        <input type="radio" name="status_${s.id}" id="pres_${s.id}" value="present" class="status-radio" checked>
-                        <label for="pres_${s.id}" class="status-label">Present</label>
-                        
-                        <input type="radio" name="status_${s.id}" id="abs_${s.id}" value="absent" class="status-radio">
-                        <label for="abs_${s.id}" class="status-label">Absent</label>
-                        
-                        <input type="radio" name="status_${s.id}" id="late_${s.id}" value="retard" class="status-radio">
-                        <label for="late_${s.id}" class="status-label">Retard</label>
-                    </div>
-                </td>
+            rowsHtml += `
+                <tr>
+                    <td>
+                        <div class="fw-bold">${s.name}</div>
+                        <div class="small text-muted">${s.email}</div>
+                    </td>
+                    <td><span class="badge bg-secondary">${s.group_name}</span></td>
+                    <td>
+                        <div class="status-toggle" data-student-id="${s.id}">
+                            <input type="radio" name="status_${s.id}" id="pres_${s.id}" value="present" class="status-radio" checked>
+                            <label for="pres_${s.id}" class="status-label">Present</label>
+                            
+                            <input type="radio" name="status_${s.id}" id="abs_${s.id}" value="absent" class="status-radio">
+                            <label for="abs_${s.id}" class="status-label">Absent</label>
+                            
+                            <input type="radio" name="status_${s.id}" id="late_${s.id}" value="retard" class="status-radio">
+                            <label for="late_${s.id}" class="status-label">Retard</label>
+                        </div>
+                    </td>
+                </tr>
             `;
-            tbody.appendChild(tr);
         });
     }
 
-    const table = document.createElement('table');
-    table.className = 'data-table';
-    table.innerHTML = `<thead><tr><th>Student</th><th>Group</th><th>Status</th></tr></thead>`;
-    table.appendChild(tbody);
-
-    wrap.innerHTML = '';
-    wrap.appendChild(table);
+    wrap.innerHTML = `
+        <table class="table table-hover align-middle">
+            <thead>
+                <tr>
+                    <th>Student Name</th>
+                    <th>Group</th>
+                    <th>Attendance Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${rowsHtml}
+            </tbody>
+        </table>
+    `;
 }
 
 function filterAttendanceList() {

@@ -63,108 +63,110 @@
                 </div>
             </header>
 
-            <!-- User Management -->
-            <section id="user-mgmt" class="section-content">
-                <div class="content-card">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h3><i class="fas fa-users-cog me-2 text-primary"></i> User Directory</h3>
-                        <button onclick="showAddUserForm()" class="btn btn-primary"><i class="fas fa-plus me-2"></i> Add New Member</button>
+            <div id="adminSection">
+                <!-- User Management -->
+                <section id="user-mgmt" class="section-content">
+                    <div class="content-card">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h3><i class="fas fa-users-cog me-2 text-primary"></i> User Directory</h3>
+                            <button onclick="showAddUserForm()" class="btn btn-primary"><i class="fas fa-plus me-2"></i> Add New Member</button>
+                        </div>
+                        <div class="table-responsive">
+                            <table id="usersTable" class="table table-hover align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Academic Email</th>
+                                        <th>Role</th>
+                                        <th>Password</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
                     </div>
-                    <div class="table-responsive">
-                        <table id="usersTable" class="table table-hover align-middle">
-                            <thead>
-                                <tr>
-                                    <th>Name</th>
-                                    <th>Academic Email</th>
-                                    <th>Role</th>
-                                    <th>Password</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody></tbody>
-                        </table>
-                    </div>
-                </div>
-            </section>
+                </section>
 
-            <!-- Event Management -->
-            <section id="event-mgmt" class="section-content hidden">
-                <div class="content-card">
-                    <h3><i class="fas fa-bullhorn me-2 text-primary"></i> Post New Update</h3>
-                    <form id="eventForm" class="row g-3 p-4 rounded-4 mb-5 border border-secondary" style="background: rgba(255,255,255,0.03);">
+                <!-- Event Management -->
+                <section id="event-mgmt" class="section-content hidden">
+                    <div class="content-card">
+                        <h3><i class="fas fa-bullhorn me-2 text-primary"></i> Post New Update</h3>
+                        <form id="eventForm" class="row g-3 p-4 rounded-4 mb-5 border border-secondary" style="background: rgba(255,255,255,0.03);">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Title</label>
+                                <input type="text" id="eventTitle" class="form-control" placeholder="e.g. S2 Exam Schedule" required>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold">Type</label>
+                                <select id="eventType" class="form-select">
+                                    <option value="event">Standard Event</option>
+                                    <option value="exam_plan">Exam Plan</option>
+                                    <option value="course_plan">Course Plan</option>
+                                    <option value="debate">Debate</option>
+                                    <option value="trip">Trip</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold">Date</label>
+                                <input type="date" id="eventDate" class="form-control" required>
+                            </div>
+                            <div class="col-md-12">
+                                <label class="form-label fw-bold">Attachment (Optional)</label>
+                                <input type="file" id="planFile" class="form-control">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-bold">Description</label>
+                                <textarea id="eventDescription" class="form-control" rows="2"></textarea>
+                            </div>
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary px-5 py-2">Publish Now</button>
+                            </div>
+                        </form>
+
+                        <h3><i class="fas fa-list me-2"></i> Published Items</h3>
+                        <div class="table-responsive mt-3">
+                            <table class="table table-hover align-middle" id="eventsListTable">
+                                <thead>
+                                    <tr>
+                                        <th>Title</th>
+                                        <th>Type</th>
+                                        <th>Date</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Analytics -->
+                <section id="stats-mgmt" class="section-content hidden">
+                    <div class="content-card">
+                        <h3><i class="fas fa-chart-line me-2 text-primary"></i> System Insights</h3>
+                        <div id="statsCards" class="stats-grid"></div>
+                    </div>
+                </section>
+
+                <!-- Data Management -->
+                <section id="data-mgmt" class="section-content hidden">
+                    <div class="row">
                         <div class="col-md-6">
-                            <label class="form-label fw-bold">Title</label>
-                            <input type="text" id="eventTitle" class="form-control" placeholder="e.g. S2 Exam Schedule" required>
+                            <div class="content-card">
+                                <h3><i class="fas fa-user-clock me-2 text-warning"></i> Recent Activity</h3>
+                                <div id="recentAttendanceList"></div>
+                            </div>
                         </div>
-                        <div class="col-md-3">
-                            <label class="form-label fw-bold">Type</label>
-                            <select id="eventType" class="form-select">
-                                <option value="event">Standard Event</option>
-                                <option value="exam_plan">Exam Plan</option>
-                                <option value="course_plan">Course Plan</option>
-                                <option value="debate">Debate</option>
-                                <option value="trip">Trip</option>
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label fw-bold">Date</label>
-                            <input type="date" id="eventDate" class="form-control" required>
-                        </div>
-                        <div class="col-md-12">
-                            <label class="form-label fw-bold">Attachment (Optional)</label>
-                            <input type="file" id="planFile" class="form-control">
-                        </div>
-                        <div class="col-12">
-                            <label class="form-label fw-bold">Description</label>
-                            <textarea id="eventDescription" class="form-control" rows="2"></textarea>
-                        </div>
-                        <div class="col-12">
-                            <button type="submit" class="btn btn-primary px-5 py-2">Publish Now</button>
-                        </div>
-                    </form>
-
-                    <h3><i class="fas fa-list me-2"></i> Published Items</h3>
-                    <div class="table-responsive mt-3">
-                        <table class="table table-hover align-middle" id="eventsListTable">
-                            <thead>
-                                <tr>
-                                    <th>Title</th>
-                                    <th>Type</th>
-                                    <th>Date</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody></tbody>
-                        </table>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Analytics -->
-            <section id="stats-mgmt" class="section-content hidden">
-                <div class="content-card">
-                    <h3><i class="fas fa-chart-line me-2 text-primary"></i> System Insights</h3>
-                    <div id="statsCards" class="stats-grid"></div>
-                </div>
-            </section>
-
-            <!-- Data Management -->
-            <section id="data-mgmt" class="section-content hidden">
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="content-card">
-                            <h3><i class="fas fa-user-clock me-2 text-warning"></i> Recent Activity</h3>
-                            <div id="recentAttendanceList"></div>
+                        <div class="col-md-6">
+                            <div class="content-card">
+                                <h3><i class="fas fa-star me-2 text-success"></i> New Grades</h3>
+                                <div id="recentGradesList"></div>
+                            </div>
                         </div>
                     </div>
-                    <div class="col-md-6">
-                        <div class="content-card">
-                            <h3><i class="fas fa-star me-2 text-success"></i> New Grades</h3>
-                            <div id="recentGradesList"></div>
-                        </div>
-                    </div>
-                </div>
-            </section>
+                </section>
+            </div>
 
             <!-- Mailbox Section -->
             <section id="mailboxSection" class="section-content hidden">
@@ -176,10 +178,14 @@
                     
                     <div class="row">
                         <div class="col-md-3">
-                            <div class="nav flex-column nav-pills">
-                                <button class="nav-link active mb-2 text-start" onclick="loadInbox()"><i class="fas fa-inbox me-2"></i> Inbox</button>
-                                <button class="nav-link mb-2 text-start" onclick="loadSent()"><i class="fas fa-share me-2"></i> Sent</button>
-                            </div>
+                            <ul class="nav flex-column nav-pills me-3" id="mailTabs">
+                                <li class="nav-item">
+                                    <button class="nav-link active mb-2 w-100 text-start" onclick="loadInbox()"><i class="fas fa-inbox me-2"></i> Inbox</button>
+                                </li>
+                                <li class="nav-item">
+                                    <button class="nav-link mb-2 w-100 text-start" onclick="loadSent()"><i class="fas fa-share me-2"></i> Sent</button>
+                                </li>
+                            </ul>
                         </div>
                         <div class="col-md-9">
                             <div id="mailList" class="list-group list-group-flush border rounded-4 overflow-hidden"></div>
