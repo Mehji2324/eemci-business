@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us - EEMCI Meknès</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="landing-page">
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top landing-nav">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">
+                <img src="logo.webp" alt="EEMCI Logo" height="50">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto gap-lg-3 align-items-center">
+                    <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="about.html">About Us</a></li>
+                    <li class="nav-item"><a class="nav-link" href="programs.html">Programs</a></li>
+                    <li class="nav-item"><a class="nav-link" href="index.html#why-us">Why Us</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="contact.html">Contact</a></li>
+                    <li class="nav-item">
+                        <button class="btn btn-primary px-4 rounded-pill" onclick="window.location.href='index.html?login=true'">Portal Login</button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header Section -->
+    <section class="hero-section d-flex align-items-center" style="min-height: 40vh; padding-top: 120px;">
+        <div class="container text-center">
+            <div class="hero-content">
+                <h1 class="display-4 fw-800 text-white mb-3">Get in Touch</h1>
+                <p class="lead text-muted mx-auto" style="max-width: 700px;">
+                    Have questions about our programs or admissions? Our team is here to help you navigate your academic future.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Content -->
+    <section class="py-100">
+        <div class="container">
+            <div class="row g-5">
+                <!-- Contact Info -->
+                <div class="col-lg-5">
+                    <div class="glass p-5 rounded-4 h-100">
+                        <h2 class="text-white fw-800 mb-4">Contact Information</h2>
+                        
+                        <div class="d-flex gap-4 mb-4">
+                            <div class="school-icon" style="min-width: 50px; height: 50px;">
+                                <i class="fas fa-map-marker-alt text-primary"></i>
+                            </div>
+                            <div>
+                                <h5 class="text-white mb-1">Our Location</h5>
+                                <p class="text-muted small">Rue Accra, Imm 14, Ville Nouvelle, (En face hôtel Nice), Meknes 50000, Maroc</p>
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-4 mb-4">
+                            <div class="school-icon" style="min-width: 50px; height: 50px;">
+                                <i class="fas fa-phone-alt text-primary"></i>
+                            </div>
+                            <div>
+                                <h5 class="text-white mb-1">Phone Numbers</h5>
+                                <p class="text-muted small mb-0">+212 5 35 40 04 17 (Fixe)</p>
+                                <p class="text-muted small mb-0">06 61 31 92 76 / 06 61 82 29 36</p>
+                                <p class="text-muted small">06 61 96 38 88 (Mobile / WhatsApp)</p>
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-4 mb-4">
+                            <div class="school-icon" style="min-width: 50px; height: 50px;">
+                                <i class="fas fa-envelope text-primary"></i>
+                            </div>
+                            <div>
+                                <h5 class="text-white mb-1">Email Address</h5>
+                                <p class="text-muted small">contact@eemci.ma</p>
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-4 mb-4">
+                            <div class="school-icon" style="min-width: 50px; height: 50px;">
+                                <i class="fas fa-clock text-primary"></i>
+                            </div>
+                            <div>
+                                <h5 class="text-white mb-1">Office Hours</h5>
+                                <p class="text-muted small mb-0">Mon - Fri: 8:30 AM – 12:30 PM / 2:30 PM – 7:15 PM</p>
+                                <p class="text-muted small mb-0">Sat: 9:00 AM – 12:30 PM / 2:30 PM – 6:30 PM</p>
+                                <p class="text-muted small">Sun: 10:00 AM – 1:00 PM</p>
+                            </div>
+                        </div>
+
+                        <div class="mt-5">
+                            <h5 class="text-white mb-3">Follow Us</h5>
+                            <div class="d-flex gap-3">
+                                <a href="https://www.facebook.com/eemci.ma" target="_blank" class="glass btn rounded-circle p-0 d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;">
+                                    <i class="fab fa-facebook-f text-primary"></i>
+                                </a>
+                                <a href="https://www.instagram.com/eemci.ma" target="_blank" class="glass btn rounded-circle p-0 d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;">
+                                    <i class="fab fa-instagram text-primary"></i>
+                                </a>
+                                <a href="#" class="glass btn rounded-circle p-0 d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;">
+                                    <i class="fab fa-linkedin-in text-primary"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contact Form -->
+                <div class="col-lg-7">
+                    <div class="glass p-5 rounded-4 h-100">
+                        <h2 class="text-white fw-800 mb-4">Send us a Message</h2>
+                        <form id="contactPageForm">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label text-muted small">Full Name</label>
+                                        <input type="text" class="form-control" placeholder="John Doe" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label text-muted small">Email Address</label>
+                                        <input type="email" class="form-control" placeholder="john@example.com" required>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="mb-3">
+                                        <label class="form-label text-muted small">Subject</label>
+                                        <input type="text" class="form-control" placeholder="Admission Inquiry" required>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="mb-4">
+                                        <label class="form-label text-muted small">Your Message</label>
+                                        <textarea class="form-control" rows="5" placeholder="How can we help you?" required></textarea>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <button type="submit" class="btn btn-primary w-100 py-3 rounded-pill fw-700">Send Message</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Map Placeholder -->
+            <div class="row mt-5">
+                <div class="col-12">
+                    <div class="glass p-2 rounded-4 overflow-hidden" style="height: 400px;">
+                        <iframe 
+                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3311.458763587633!2d-5.55!3d33.9!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMzPCsDU0JzAwLjAiTiA1wrAzMycwMC4wIlc!5e0!3m2!1sen!2sma!4v1621580000000!5m2!1sen!2sma" 
+                            width="100%" height="100%" style="border:0; filter: invert(90%) hue-rotate(180deg) brightness(95%) contrast(90%);" allowfullscreen="" loading="lazy">
+                        </iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="contact" class="py-5 border-top border-secondary">
+        <div class="container">
+            <div class="row g-5">
+                <div class="col-lg-4">
+                    <img src="logo.webp" alt="Logo" height="60" class="mb-4">
+                    <p class="text-muted">The superior school that makes the difference in Meknès. Bac to Bac+8 programs.</p>
+                </div>
+                <div class="col-lg-4">
+                    <h5 class="text-white mb-4 fw-700">Quick Links</h5>
+                    <ul class="list-unstyled text-muted">
+                        <li class="mb-2"><a href="index.html" class="text-decoration-none text-muted">Home</a></li>
+                        <li class="mb-2"><a href="about.html" class="text-decoration-none text-muted">About Us</a></li>
+                        <li class="mb-2"><a href="programs.html" class="text-decoration-none text-muted">Programs</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-4">
+                    <h5 class="text-white mb-4 fw-700">Admission Office</h5>
+                    <p class="text-muted small mb-2"><i class="fas fa-phone me-2 text-primary"></i> +212 5 35 40 04 17</p>
+                    <p class="text-muted small mb-2"><i class="fas fa-envelope me-2 text-primary"></i> contact@eemci.ma</p>
+                </div>
+            </div>
+            <div class="text-center mt-5 pt-4 border-top border-secondary text-muted small">
+                <p>&copy; 2026 EEMCI Platform. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.getElementById('contactPageForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            Swal.fire({
+                title: 'Message Sent!',
+                text: 'Thank you for contacting EEMCI. We will get back to you shortly.',
+                icon: 'success',
+                confirmButtonColor: '#4f46e5',
+                background: '#1e293b',
+                color: '#fff'
+            });
+            this.reset();
+        });
+    </script>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Academic Programs - EEMCI Meknès</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="landing-page">
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top landing-nav">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">
+                <img src="logo.webp" alt="EEMCI Logo" height="50">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto gap-lg-3 align-items-center">
+                    <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="about.html">About Us</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="programs.html">Programs</a></li>
+                    <li class="nav-item"><a class="nav-link" href="index.html#why-us">Why Us</a></li>
+                    <li class="nav-item"><a class="nav-link" href="contact.html">Contact</a></li>
+                    <li class="nav-item">
+                        <button class="btn btn-primary px-4 rounded-pill" onclick="window.location.href='index.html?login=true'">Portal Login</button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header Section -->
+    <section class="hero-section d-flex align-items-center" style="min-height: 40vh; padding-top: 120px;">
+        <div class="container text-center">
+            <div class="hero-content">
+                <h1 class="display-4 fw-800 text-white mb-3">Our Academic Programs</h1>
+                <p class="lead text-muted mx-auto" style="max-width: 700px;">
+                    Comprehensive higher education paths from Bac to Doctorate, accredited by the state and recognized internationally.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Detailed Programs -->
+    <section class="py-100">
+        <div class="container">
+            <div class="row g-5">
+                <!-- School of Management, Commerce & IT -->
+                <div class="col-lg-6">
+                    <div class="school-card glass p-5 h-100">
+                        <div class="school-icon mb-4"><i class="fas fa-laptop-code text-primary"></i></div>
+                        <h2 class="text-white fw-800 mb-4">School of Management, Commerce & IT</h2>
+                        
+                        <div class="program-level mb-4">
+                            <h5 class="text-primary fw-700 mb-3"><i class="fas fa-certificate me-2"></i>Technician & Specialized Technician</h5>
+                            <ul class="list-unstyled text-muted ps-4">
+                                <li class="mb-2">Action Commerciale et Marketing (2 years)</li>
+                                <li class="mb-2">Finance, Digital, or Applied Commerce (2 years)</li>
+                            </ul>
+                        </div>
+
+                        <div class="program-level mb-4">
+                            <h5 class="text-primary fw-700 mb-3"><i class="fas fa-user-graduate me-2"></i>Bachelor (Bac+3 - 180 ECTS)</h5>
+                            <ul class="list-unstyled text-muted ps-4">
+                                <li class="mb-2">IT Systems & Network Administration</li>
+                                <li class="mb-2">Banking & Insurance</li>
+                                <li class="mb-2">International Trade</li>
+                                <li class="mb-2">Digital Marketing & Social Media</li>
+                            </ul>
+                        </div>
+
+                        <div class="program-level mb-4">
+                            <h5 class="text-primary fw-700 mb-3"><i class="fas fa-award me-2"></i>Master (Bac+5 - 300 ECTS)</h5>
+                            <ul class="list-unstyled text-muted ps-4">
+                                <li class="mb-2">IT Development & Project Management</li>
+                                <li class="mb-2">Cyber Security & Infrastructure</li>
+                                <li class="mb-2">Strategic Finance & Management</li>
+                            </ul>
+                        </div>
+
+                        <div class="program-level">
+                            <h5 class="text-primary fw-700 mb-3"><i class="fas fa-microscope me-2"></i>Doctorate (Bac+8)</h5>
+                            <ul class="list-unstyled text-muted ps-4">
+                                <li class="mb-2">Audit, Accounting & Management Control</li>
+                                <li class="mb-2">Big Data, Business Analytics & Decision Support</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- School of Hospitality & Tourism -->
+                <div class="col-lg-6">
+                    <div class="school-card glass p-5 h-100">
+                        <div class="school-icon mb-4"><i class="fas fa-hotel text-secondary"></i></div>
+                        <h2 class="text-white fw-800 mb-4">School of Hospitality & Tourism</h2>
+                        
+                        <div class="program-level mb-4">
+                            <h5 class="text-secondary fw-700 mb-3"><i class="fas fa-concierge-bell me-2"></i>Technician & Specialized Technician</h5>
+                            <ul class="list-unstyled text-muted ps-4">
+                                <li class="mb-2">Hospitality, Front Desk & Reception (2 years)</li>
+                                <li class="mb-2">Operational Management of Hotel Establishments (2 years)</li>
+                            </ul>
+                        </div>
+
+                        <div class="program-level mb-4">
+                            <h5 class="text-secondary fw-700 mb-3"><i class="fas fa-star me-2"></i>Bachelor (Bac+3 - 180 ECTS)</h5>
+                            <ul class="list-unstyled text-muted ps-4">
+                                <li class="mb-2">Luxury Hotel Management (Double Moroccan-French Degree)</li>
+                            </ul>
+                        </div>
+
+                        <div class="program-level mb-4">
+                            <h5 class="text-secondary fw-700 mb-3"><i class="fas fa-crown me-2"></i>Master (Bac+5 - 300 ECTS)</h5>
+                            <ul class="list-unstyled text-muted ps-4">
+                                <li class="mb-2">Strategic Direction for International Hotel Groups</li>
+                            </ul>
+                        </div>
+
+                        <div class="program-level">
+                            <h5 class="text-secondary fw-700 mb-3"><i class="fas fa-compass me-2"></i>Doctorate (Bac+8)</h5>
+                            <ul class="list-unstyled text-muted ps-4">
+                                <li class="mb-2">Research & Innovation for Future Tourism</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Accreditation Section -->
+            <div class="row mt-5 pt-5">
+                <div class="col-12 text-center mb-5">
+                    <h2 class="text-white fw-800">Why Study at EEMCI?</h2>
+                </div>
+                <div class="col-md-4">
+                    <div class="glass p-4 rounded-4 text-center h-100">
+                        <i class="fas fa-stamp text-primary mb-4" style="font-size: 3rem;"></i>
+                        <h4 class="text-white">State Accreditation</h4>
+                        <p class="text-muted">All our programs are accredited by the Moroccan State, ensuring the quality and recognition of your diploma.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="glass p-4 rounded-4 text-center h-100">
+                        <i class="fas fa-handshake text-primary mb-4" style="font-size: 3rem;"></i>
+                        <h4 class="text-white">Professional Insertion</h4>
+                        <p class="text-muted">Direct partnerships with companies like APTIV, DEKRA, and Adecco for internships and job opportunities.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="glass p-4 rounded-4 text-center h-100">
+                        <i class="fas fa-globe-europe text-primary mb-4" style="font-size: 3rem;"></i>
+                        <h4 class="text-white">International Outlook</h4>
+                        <p class="text-muted">Double degrees in partnership with the European Federation of Schools (FEDE) and WES SUP.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="contact" class="py-5 border-top border-secondary">
+        <div class="container">
+            <div class="row g-5">
+                <div class="col-lg-4">
+                    <img src="logo.webp" alt="Logo" height="60" class="mb-4">
+                    <p class="text-muted">The superior school that makes the difference in Meknès. Bac to Bac+8 programs.</p>
+                </div>
+                <div class="col-lg-4">
+                    <h5 class="text-white mb-4 fw-700">Quick Links</h5>
+                    <ul class="list-unstyled text-muted">
+                        <li class="mb-2"><a href="index.html" class="text-decoration-none text-muted">Home</a></li>
+                        <li class="mb-2"><a href="about.html" class="text-decoration-none text-muted">About Us</a></li>
+                        <li class="mb-2"><a href="contact.html" class="text-decoration-none text-muted">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-4">
+                    <h5 class="text-white mb-4 fw-700"><a href="contact.html" class="text-decoration-none text-white">Contact Us</a></h5>
+                    <p class="text-muted small mb-2"><i class="fas fa-map-marker-alt me-2 text-primary"></i> Rue Accra, Imm 14, Ville Nouvelle, Meknes</p>
+                    <p class="text-muted small mb-2"><i class="fas fa-phone me-2 text-primary"></i> +212 535 40 04 17</p>
+                    <p class="text-muted small mb-2"><i class="fas fa-envelope me-2 text-primary"></i> contact@eemci.ma</p>
+                </div>
+            </div>
+            <div class="text-center mt-5 pt-4 border-top border-secondary text-muted small">
+                <p>&copy; 2026 EEMCI Platform. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
