@@ -3,40 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EEMCI Platform - Dashboard</title>
+    <title>EEMCI Platform - Student Dashboard</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <!-- Font Awesome -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="dashboard-wrapper">
         <aside>
-            <img src="logo.webp" alt="EEMCI Logo" class="sidebar-logo">
+            <div class="sidebar-header">
+                <img src="logo.webp" alt="EEMCI Logo" class="sidebar-logo">
+            </div>
             
-            <!-- User Profile Widget -->
             <div class="user-profile-widget">
-                <div class="avatar" id="userAvatar">U</div>
-                <div class="greeting-text" id="timeGreeting">Good day,</div>
-                <div style="font-weight: 700; font-size: 1rem;" id="userNameSidebar">User Name</div>
+                <div class="avatar" id="userAvatar">S</div>
+                <div class="greeting-text" id="timeGreeting">Good morning,</div>
+                <div style="font-weight: 800; font-size: 1.1rem; color: white;" id="userNameSidebar">Student Name</div>
             </div>
 
-            <h2 id="roleTitle">Dashboard</h2>
             <ul id="sidebarMenu">
                 <!-- Menu items injected by JS -->
             </ul>
+
+            <div style="margin-top: auto;">
+                <button class="logout-btn w-100" onclick="logout()">
+                    <i class="fas fa-sign-out-alt me-2"></i> Sign Out
+                </button>
+            </div>
         </aside>
 
         <main>
             <header>
                 <div class="welcome-box">
                     <h1 id="welcomeText">Welcome</h1>
-                    <p id="currentDate"></p>
+                    <p id="currentDate" class="text-muted"></p>
                 </div>
-                <button class="logout-btn" onclick="logout()">Logout</button>
+                <div class="header-actions">
+                    <span class="badge bg-primary px-3 py-2">Student Portal</span>
+                </div>
             </header>
 
             <!-- Stats Overview (Dynamic) -->
@@ -102,7 +112,7 @@
                         <h3>📊 Academic Performance</h3>
                         <div class="table-container">
                             <table id="gradesTable" class="table table-hover align-middle">
-                                <thead class="table-light"><tr><th>Module</th><th>Note / 20</th><th>Status</th></tr></thead>
+                                <thead><tr><th>Module</th><th>Note / 20</th><th>Status</th></tr></thead>
                                 <tbody></tbody>
                             </table>
                         </div>
@@ -115,7 +125,7 @@
                         <h3>🗓️ Weekly Study Plan</h3>
                         <div class="table-container">
                             <table id="scheduleTable" class="table table-hover align-middle">
-                                <thead class="table-light"><tr><th>Day</th><th>Time</th><th>Module</th></tr></thead>
+                                <thead><tr><th>Day</th><th>Time</th><th>Module</th></tr></thead>
                                 <tbody></tbody>
                             </table>
                         </div>
@@ -128,7 +138,7 @@
                         <h3>📝 Examination Schedule</h3>
                         <div class="table-container">
                             <table id="examScheduleTable" class="table table-hover align-middle">
-                                <thead class="table-light"><tr><th>Date</th><th>Time</th><th>Module</th></tr></thead>
+                                <thead><tr><th>Date</th><th>Time</th><th>Module</th></tr></thead>
                                 <tbody></tbody>
                             </table>
                         </div>
@@ -256,7 +266,7 @@
                         </div>
                         <div class="table-container">
                             <table id="usersTable" class="table table-hover align-middle">
-                                <thead class="table-light">
+                                <thead>
                                     <tr>
                                         <th>Name</th>
                                         <th>Academic Email</th>
@@ -281,7 +291,7 @@
                         <form id="userForm">
                             <input type="text" id="userName" placeholder="Full Name" required oninput="previewEmail()">
                             
-                            <div id="emailPreviewBox" class="alert alert-info py-2 px-3 small d-none mb-3">
+                            <div id="emailPreviewBox" class="alert alert-primary py-2 px-3 small d-none mb-3">
                                 <i class="fas fa-info-circle me-1"></i> Generated Email: <strong id="emailPreviewText"></strong>
                             </div>
 

@@ -15,7 +15,7 @@ const messageRoutes = require('./routes/messageRoutes');
 const errorMiddleware = require('./middleware/errorMiddleware');
 
 const app = express();
-const PORT = 5001;
+const PORT = process.env.PORT || 5001;
 
 // 1. Middlewares
 app.use(helmet({ contentSecurityPolicy: false }));

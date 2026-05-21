@@ -1,6 +1,6 @@
 /* prof-script.js - Logic for Professor Dashboard */
 
-const API_URL = 'http://localhost:5001/api';
+const API_URL = '/api';
 let allStudents = [];
 let myCourses = [];
 let allRecords = [];
@@ -223,7 +223,7 @@ function renderMailList(messages, type) {
     }
 
     list.innerHTML = messages.map(m => `
-        <button class="list-group-item list-group-item-action p-3 border-0 border-bottom ${m.is_read || type === 'sent' ? '' : 'bg-light fw-bold'}" onclick="viewMessage(${JSON.stringify(m).replace(/"/g, '&quot;')}, '${type}')">
+        <button class="list-group-item list-group-item-action p-3 border-0 border-bottom ${m.is_read || type === 'sent' ? '' : 'unread fw-bold'}" onclick="viewMessage(${JSON.stringify(m).replace(/"/g, '&quot;')}, '${type}')">
             <div class="d-flex justify-content-between mb-1">
                 <span>${type === 'inbox' ? m.sender_name : m.receiver_name}</span>
                 <small class="text-muted">${new Date(m.created_at).toLocaleDateString()}</small>
@@ -410,7 +410,7 @@ function renderCourses() {
         <div class="course-card">
             <span class="course-dept">${c.department}</span>
             <h4>${c.title}</h4>
-            <a href="http://localhost:5001/${c.file_path}" target="_blank" class="btn-outline" style="display:inline-block; margin-top:1rem; text-decoration:none;">View File</a>
+            <a href="${c.file_path}" target="_blank" class="btn-outline" style="display:inline-block; margin-top:1rem; text-decoration:none;">View File</a>
         </div>
     `).join('');
 

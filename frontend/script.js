@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:5001/api';
+const API_URL = '/api';
 
 // ─── AUTHENTICATION & INITIALIZATION ─────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
@@ -247,7 +247,7 @@ function renderMailList(messages, type) {
     }
 
     list.innerHTML = messages.map(m => `
-        <button class="list-group-item list-group-item-action p-3 ${m.is_read || type === 'sent' ? '' : 'bg-light fw-bold'}" onclick="viewMessage(${JSON.stringify(m).replace(/"/g, '&quot;')}, '${type}')">
+        <button class="list-group-item list-group-item-action p-3 ${m.is_read || type === 'sent' ? '' : 'unread fw-bold'}" onclick="viewMessage(${JSON.stringify(m).replace(/"/g, '&quot;')}, '${type}')">
             <div class="d-flex justify-content-between mb-1">
                 <span>${type === 'inbox' ? m.sender_name : m.receiver_name}</span>
                 <small class="text-muted">${new Date(m.created_at).toLocaleDateString()}</small>

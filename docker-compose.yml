@@ -1,0 +1,40 @@
+services:
+  app:
+    build: .
+    ports:
+      - "5001:5001"
+    environment:
+      - DB_HOST=db
+      - DB_USER=root
+      - DB_PASSWORD=root_password
+      - DB_NAME=eemci_db
+      - PORT=5001
+      - JWT_SECRET=your_super_secret_key_123
+    volumes:
+      - .:/usr/src/app
+      - uploads_data:/usr/src/app/backend/uploads
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: mysql:8.0
+    restart: always
+    environment:
+      - MYSQL_DATABASE=eemci_db
+      - MYSQL_ROOT_PASSWORD=root_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./database/eemci.sql:/docker-entrypoint-initdb.d/01-init.sql
+      - ./database/seed_professors.sql:/docker-entrypoint-initdb.d/02-seed.sql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$MYSQL_ROOT_PASSWORD"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  db_data:
+  uploads_data:
