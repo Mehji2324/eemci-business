@@ -313,6 +313,7 @@ async function initDashboard(user) {
                 <li onclick="switchAdminTab('user-mgmt', this)" class="active"><i class="fas fa-users"></i> Users</li>
                 <li onclick="switchAdminTab('event-mgmt', this)"><i class="fas fa-calendar-alt"></i> Events</li>
                 <li onclick="switchAdminTab('stats-mgmt', this)"><i class="fas fa-chart-pie"></i> Stats</li>
+                <li onclick="window.location.href='payment-management.html'"><i class="fas fa-wallet"></i> Manage Payments</li>
                 <li onclick="switchAdminTab('data-mgmt', this)"><i class="fas fa-database"></i> Data</li>
                 <li onclick="switchAdminTab('mailboxSection', this)"><i class="fas fa-envelope"></i> Mailbox ${badge}</li>
             `;

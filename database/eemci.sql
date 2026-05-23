@@ -98,6 +98,21 @@ CREATE TABLE IF NOT EXISTS messages (
     FOREIGN KEY (receiver_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
+-- Payments Table
+CREATE TABLE IF NOT EXISTS payments (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    student_id INT NOT NULL,
+    month INT NOT NULL,
+    year INT NOT NULL,
+    total_amount DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
+    paid_amount DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
+    status ENUM('paid', 'pending') DEFAULT 'pending',
+    paid_at TIMESTAMP NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (student_id) REFERENCES users(id) ON DELETE CASCADE,
+    UNIQUE KEY unique_payment (student_id, month, year)
+);
+
 -- Sample Data
 -- Super Admin (Email: admin.eemci@eemci.com | Pass: Admin@2026)
 INSERT INTO users (name, email, password, role) VALUES 

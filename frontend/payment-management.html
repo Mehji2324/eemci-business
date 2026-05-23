@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="payment.css">
+    <title>Payment Management | EEMCI</title>
+</head>
+<body class="bg-dark text-white">
+    <div class="container-fluid p-4">
+        <div class="d-flex justify-content-between align-items-center mb-5">
+            <div>
+                <button class="btn btn-sm btn-outline-secondary mb-2" onclick="window.location.href='admin-dashboard.html'"><i class="fas fa-arrow-left"></i> Back to Dashboard</button>
+                <h2 class="fw-bold"><i class="fas fa-wallet text-primary me-2"></i> Payment Management</h2>
+            </div>
+            <div class="d-flex gap-2">
+                <select id="monthSelect" class="form-select bg-dark text-white border-secondary" style="width: auto;"></select>
+                <select id="yearSelect" class="form-select bg-dark text-white border-secondary" style="width: auto;"></select>
+            </div>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div id="tabs" class="d-flex gap-2 mb-3">
+                    <button onclick="switchTab('pending')" class="btn btn-outline-warning active px-4">Pending</button>
+                    <button onclick="switchTab('paid')" class="btn btn-outline-success px-4">Paid</button>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="input-group">
+                    <span class="input-group-text bg-dark border-secondary text-muted"><i class="fas fa-search"></i></span>
+                    <input type="text" id="searchInput" class="form-control bg-dark text-white border-secondary" placeholder="Search students by name or email...">
+                </div>
+            </div>
+        </div>
+        
+        <div id="cardContainer" class="row g-4"></div>
+        <div id="skeletonLoader" class="hidden">Loading...</div>
+    </div>
+
+    <!-- History Modal -->
+    <div id="historyModal" class="modal hidden">
+        <div class="modal-content">
+            <span onclick="closeModal()" class="close">&times;</span>
+            <div id="historyContent"></div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+    <script src="payment.js"></script>
+</body>
+</html>

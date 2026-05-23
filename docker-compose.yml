@@ -1,40 +1,37 @@
+
 services:
-  app:
+  db:
+    image: docker.io/library/mysql:8.0
+    container_name: eemci_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: eemci_db
+      MYSQL_USER: user
+      MYSQL_PASSWORD: user_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./database/eemci.sql:/docker-entrypoint-initdb.d/init.sql:Z
+      - mysql_data:/var/lib/mysql:Z
+
+  backend:
     build: .
+    container_name: eemci_backend
+    restart: always
     ports:
       - "5001:5001"
     environment:
+      - PORT=5001
       - DB_HOST=db
       - DB_USER=root
       - DB_PASSWORD=root_password
       - DB_NAME=eemci_db
-      - PORT=5001
       - JWT_SECRET=your_super_secret_key_123
     volumes:
-      - .:/usr/src/app
-      - uploads_data:/usr/src/app/backend/uploads
+      - ./backend/uploads:/app/backend/uploads:Z
     depends_on:
-      db:
-        condition: service_healthy
-
-  db:
-    image: mysql:8.0
-    restart: always
-    environment:
-      - MYSQL_DATABASE=eemci_db
-      - MYSQL_ROOT_PASSWORD=root_password
-    ports:
-      - "3307:3306"
-    volumes:
-      - db_data:/var/lib/mysql
-      - ./database/eemci.sql:/docker-entrypoint-initdb.d/01-init.sql
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$$MYSQL_ROOT_PASSWORD"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      - db
 
 volumes:
-  db_data:
-  uploads_data:
-
+  mysql_data:
