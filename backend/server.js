@@ -12,6 +12,7 @@ const professorRoutes = require('./routes/professorRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const eventRoutes = require('./routes/eventRoutes');
 const messageRoutes = require('./routes/messageRoutes');
+const notificationRoutes = require('./routes/notificationRoutes');
 const errorMiddleware = require('./middleware/errorMiddleware');
 
 const app = express();
@@ -31,6 +32,7 @@ app.use('/api/student', studentRoutes);
 app.use('/api/professor', professorRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/messages', messageRoutes);
+app.use('/api/notifications', notificationRoutes);
 
 // 3. Static Files
 const frontendPath = path.join(__dirname, '..', 'frontend');

@@ -1,5 +1,7 @@
+const db = require('../config/db');
 const Event = require('../models/Event');
 const asyncHandler = require('../utils/asyncHandler');
+const { createNotification } = require('./notificationController');
 
 exports.createEvent = asyncHandler(async (req, res) => {
     const { title, description, date, location, type } = req.body;
@@ -15,6 +17,17 @@ exports.createEvent = asyncHandler(async (req, res) => {
         type, 
         file_path 
     });
+
+    // Notify all users about the new event
+    const [allUsers] = await db.execute('SELECT id FROM users');
+    for (const user of allUsers) {
+      await createNotification(
+        user.id,
+        'event',
+        '📅 New Event Added',
+        `A new event has been published: "${title}"`
+      );
+    }
 
     res.status(201).json({ 
         success: true, 

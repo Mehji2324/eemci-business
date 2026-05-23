@@ -45,6 +45,23 @@
                     <p id="currentDate" class="text-muted"></p>
                 </div>
                 <div class="header-actions">
+                    <!-- Notification Bell -->
+                    <div class="notif-wrapper" style="position: relative; display: inline-block; margin-right: 1rem;">
+                      <button class="btn btn-outline-light position-relative" onclick="toggleNotifDropdown()" id="notifBellBtn">
+                        <i class="fas fa-bell"></i>
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" 
+                              id="notifBadge" style="display:none; font-size: 0.65rem;">0</span>
+                      </button>
+                      <div id="notifDropdown" class="notif-dropdown" style="display:none;">
+                        <div class="notif-header">
+                          <strong>Notifications</strong>
+                          <button class="btn btn-sm btn-link text-muted" onclick="markAllNotifsRead()">Mark all read</button>
+                        </div>
+                        <div id="notifList" class="notif-list">
+                          <div class="text-center text-muted py-3">Loading...</div>
+                        </div>
+                      </div>
+                    </div>
                     <span class="badge bg-primary px-3 py-2">Student Portal</span>
                 </div>
             </header>

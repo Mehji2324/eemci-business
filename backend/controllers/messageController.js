@@ -1,5 +1,6 @@
 const db = require('../config/db');
 const asyncHandler = require('../utils/asyncHandler');
+const { createNotification } = require('./notificationController');
 
 // Send a message
 exports.sendMessage = asyncHandler(async (req, res) => {
@@ -13,6 +14,18 @@ exports.sendMessage = asyncHandler(async (req, res) => {
     await db.execute(
         'INSERT INTO messages (sender_id, receiver_id, subject, content) VALUES (?, ?, ?, ?)',
         [sender_id, receiver_id, subject || '(No Subject)', content]
+    );
+
+    // Get sender name
+    const [senderRows] = await db.execute('SELECT name FROM users WHERE id = ?', [sender_id]);
+    const senderName = senderRows[0]?.name || 'Someone';
+
+    // Notify receiver
+    await createNotification(
+      receiver_id,
+      'message',
+      '📩 New Message',
+      `${senderName} sent you a message: "${subject || '(No Subject)'}"` 
     );
 
     res.status(201).json({ success: true, message: 'Message sent successfully' });

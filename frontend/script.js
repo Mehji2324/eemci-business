@@ -64,6 +64,124 @@ function toggleLoginModal() {
     if (modal) modal.classList.toggle('hidden');
 }
 
+// ─── NOTIFICATION SYSTEM ─────────────────────────────────────────
+let notifOpen = false;
+let notifPollInterval = null;
+
+function getNotifIcon(type) {
+  const icons = {
+    message: '📩',
+    event: '📅',
+    course: '📚',
+    grade: '📊',
+    general: '🔔'
+  };
+  return icons[type] || '🔔';
+}
+
+function getNotifTypeLabel(type) {
+  const labels = {
+    message: 'New message received',
+    event: 'New event published',
+    course: 'New course available',
+    grade: 'Grade updated',
+    general: 'Notification'
+  };
+  return labels[type] || 'Notification';
+}
+
+async function loadNotifications() {
+  try {
+    const res = await apiFetch('/notifications');
+    if (!res || !res.ok) return;
+    const notifs = await res.json();
+
+    const unread = notifs.filter(n => !n.is_read).length;
+    const badge = document.getElementById('notifBadge');
+    if (badge) {
+      badge.textContent = unread > 9 ? '9+' : unread;
+      badge.style.display = unread > 0 ? 'block' : 'none';
+    }
+
+    const list = document.getElementById('notifList');
+    if (!list) return;
+
+    if (notifs.length === 0) {
+      list.innerHTML = '<div class="notif-empty">🔔 No notifications yet</div>';
+      return;
+    }
+
+    list.innerHTML = notifs.map(n => `
+      <div class="notif-item ${n.is_read ? '' : 'unread'}" onclick="handleNotifClick(${n.id}, '${n.type}')">
+        <div class="notif-icon">${getNotifIcon(n.type)}</div>
+        <div class="notif-body">
+          <strong>${n.title}</strong>
+          <p style="margin:0; font-size:0.82rem; color:rgba(255,255,255,0.7);">${n.message}</p>
+          <span>${getNotifTypeLabel(n.type)} · ${timeAgo(n.created_at)}</span>
+        </div>
+      </div>
+    `).join('');
+  } catch (e) {
+    console.error('Notification load error:', e);
+  }
+}
+
+async function handleNotifClick(notifId, type) {
+  await apiFetch(`/notifications/read/${notifId}`, { method: 'PUT' });
+
+  if (type === 'message') {
+    const mailTab = document.querySelector('[onclick*="mailboxSection"]');
+    if(mailTab) switchStudentSection('mailboxSection', mailTab);
+    else switchAdminTab('mailboxSection', document.querySelector('[onclick*="mailboxSection"]'));
+  } else if (type === 'event') {
+    switchStudentSection('studentEvents', document.querySelector('[onclick*="studentEvents"]'));
+  } else if (type === 'course') {
+    switchStudentSection('studentCourses', document.querySelector('[onclick*="studentCourses"]'));
+  }
+
+  await loadNotifications();
+  document.getElementById('notifDropdown').style.display = 'none';
+  notifOpen = false;
+}
+
+async function markAllNotifsRead() {
+  await apiFetch('/notifications/read-all', { method: 'PUT' });
+  await loadNotifications();
+}
+
+function toggleNotifDropdown() {
+  const dropdown = document.getElementById('notifDropdown');
+  if (!dropdown) return;
+  notifOpen = !notifOpen;
+  dropdown.style.display = notifOpen ? 'block' : 'none';
+  if (notifOpen) loadNotifications();
+}
+
+function timeAgo(dateStr) {
+  const now = new Date();
+  const then = new Date(dateStr);
+  const diff = Math.floor((now - then) / 1000);
+  if (diff < 60) return 'just now';
+  if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+  if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+  return `${Math.floor(diff / 86400)}d ago`;
+}
+
+document.addEventListener('click', (e) => {
+  const wrapper = document.querySelector('.notif-wrapper');
+  if (wrapper && !wrapper.contains(e.target)) {
+    const dropdown = document.getElementById('notifDropdown');
+    if (dropdown) dropdown.style.display = 'none';
+    notifOpen = false;
+  }
+});
+
+function startNotifPolling() {
+  loadNotifications();
+  notifPollInterval = setInterval(loadNotifications, 30000);
+}
+// ─── END NOTIFICATION SYSTEM ─────────────────────────────────────
+
 // Navbar Scroll Effect
 window.addEventListener('scroll', () => {
     const nav = document.querySelector('.landing-nav');

@@ -1,6 +1,7 @@
 const db = require('../config/db');
 const ExcelJS = require('exceljs');
 const asyncHandler = require('../utils/asyncHandler');
+const { createNotification } = require('./notificationController');
 
 // ─── Upload Course ──────────────────────────────────────────────────────────
 exports.uploadCourse = asyncHandler(async (req, res) => {
@@ -16,6 +17,20 @@ exports.uploadCourse = asyncHandler(async (req, res) => {
         'INSERT INTO courses (title, file_path, professor_id, department) VALUES (?, ?, ?, ?)',
         [title, filePath, req.user.id, department]
     );
+
+    // Notify all students
+    const [students] = await db.execute("SELECT id FROM users WHERE role = 'student'");
+    const [profRows] = await db.execute('SELECT name FROM users WHERE id = ?', [req.user.id]);
+    const profName = profRows[0]?.name || 'A professor';
+
+    for (const student of students) {
+      await createNotification(
+        student.id,
+        'course',
+        '📚 New Course Available',
+        `${profName} uploaded a new course: "${title}"`
+      );
+    }
 
     res.status(201).json({ success: true, message: 'Resource uploaded successfully.', file: file.filename });
 });

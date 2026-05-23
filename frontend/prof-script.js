@@ -15,8 +15,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Set Date
-    const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    document.getElementById('currentDate').textContent = new Date().toLocaleDateString('en-US', dateOptions);
+    const dateEl = document.getElementById('currentDate');
+    if (dateEl) {
+        const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        dateEl.textContent = new Date().toLocaleDateString('en-US', dateOptions);
+    }
 
     // Set default attendance date to today
     const bulkDateInput = document.getElementById('bulkDate');
@@ -29,6 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadDashboardData();
     setupDropZone();
     updateUnreadBadge();
+    initNotifications();
 });
 
 function logout() {
