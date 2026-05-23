@@ -6,10 +6,13 @@ let myCourses = [];
 let allRecords = [];
 
 document.addEventListener('DOMContentLoaded', () => {
+    if (typeof initTheme === 'function') initTheme();
     const token = sessionStorage.getItem('token');
     const user = JSON.parse(sessionStorage.getItem('user'));
 
     if (!token || user?.role !== 'professor') {
+        // If login form is present, don't redirect, just stop loading data
+        if (document.getElementById('loginForm')) return;
         window.location.href = 'index.html';
         return;
     }
@@ -107,6 +110,7 @@ function quickMessage(receiverId) {
 // ─── Data Loading ───
 async function fetchWithAuth(endpoint, options = {}) {
     const token = sessionStorage.getItem('token');
+    if (!token) return null;
     
     // Set default headers
     const headers = { ...options.headers };
@@ -133,7 +137,7 @@ async function apiFetch(endpoint, options = {}) {
 async function loadProfile() {
     try {
         const res = await fetchWithAuth('/professor/profile');
-        if (res.ok) {
+        if (res && res.ok) {
             const profile = await res.json();
             document.getElementById('profName').textContent = profile.name;
             document.getElementById('profEmail').textContent = profile.academic_email || profile.email;
@@ -150,7 +154,7 @@ async function loadDashboardData() {
     try {
         // 1. Students
         const resStudents = await fetchWithAuth('/professor/students');
-        if (resStudents.ok) {
+        if (resStudents && resStudents.ok) {
             allStudents = await resStudents.json();
             document.getElementById('statStudents').textContent = allStudents.length;
             populateStudentSelects();
@@ -158,19 +162,21 @@ async function loadDashboardData() {
             
             // Populate groups filter
             const groupSelect = document.getElementById('bulkGroup');
-            groupSelect.innerHTML = '<option value="">All Groups</option>';
-            const groups = [...new Set(allStudents.map(s => s.group_name))];
-            groups.forEach(g => {
-                const opt = document.createElement('option');
-                opt.value = g;
-                opt.textContent = g;
-                groupSelect.appendChild(opt);
-            });
+            if (groupSelect) {
+                groupSelect.innerHTML = '<option value="">All Groups</option>';
+                const groups = [...new Set(allStudents.map(s => s.group_name))];
+                groups.forEach(g => {
+                    const opt = document.createElement('option');
+                    opt.value = g;
+                    opt.textContent = g;
+                    groupSelect.appendChild(opt);
+                });
+            }
         }
 
         // 2. Courses
         const resCourses = await fetchWithAuth('/professor/my-courses');
-        if (resCourses.ok) {
+        if (resCourses && resCourses.ok) {
             myCourses = await resCourses.json();
             document.getElementById('statCourses').textContent = myCourses.length;
             renderCourses();
@@ -178,11 +184,12 @@ async function loadDashboardData() {
 
         // 3. Records (Attendance & trigger stats)
         const resRecords = await fetchWithAuth('/professor/attendance');
-        if (resRecords.ok) {
+        if (resRecords && resRecords.ok) {
             allRecords = await resRecords.json();
             document.getElementById('statAttendance').textContent = allRecords.length;
             renderRecordsTable(allRecords);
-            document.getElementById('statGrades').textContent = "—"; 
+            const statGrades = document.getElementById('statGrades');
+            if (statGrades) statGrades.textContent = "—"; 
         }
 
     } catch (err) {
@@ -212,6 +219,7 @@ async function loadInbox() {
     document.getElementById('btnSent').classList.remove('active');
 
     const res = await apiFetch('/messages/inbox');
+    if (!res) return;
     const messages = await res.json();
     
     renderMailList(messages, 'inbox');
@@ -224,6 +232,7 @@ async function loadSent() {
     document.getElementById('btnSent').classList.add('active');
 
     const res = await apiFetch('/messages/sent');
+    if (!res) return;
     const messages = await res.json();
     
     renderMailList(messages, 'sent');
@@ -287,7 +296,7 @@ async function showComposeModal() {
     
     if (allRecipients.length === 0) {
         const res = await apiFetch('/messages/recipients');
-        allRecipients = await res.json();
+        if (res) allRecipients = await res.json();
     }
     
     const select = document.getElementById('msgRecipient');
@@ -297,7 +306,8 @@ async function showComposeModal() {
 
 function hideComposeModal() {
     document.getElementById('composeModal').classList.add('hidden');
-    document.getElementById('composeForm').reset();
+    const form = document.getElementById('composeForm');
+    if (form) form.reset();
 }
 
 function replyMessage(senderId, subject, senderName) {
@@ -322,12 +332,10 @@ document.getElementById('composeForm')?.addEventListener('submit', async (e) => 
         body: JSON.stringify(payload)
     });
 
-    if (res.ok) {
+    if (res && res.ok) {
         Swal.fire('Sent!', 'Your message has been delivered.', 'success');
         hideComposeModal();
-        if (document.getElementById('secMessages').classList.contains('hidden')) {
-             // do nothing
-        } else {
+        if (!document.getElementById('secMessages').classList.contains('hidden')) {
             loadSent();
         }
     } else {
@@ -402,13 +410,13 @@ document.getElementById('uploadForm')?.addEventListener('submit', async (e) => {
             body: formData
         });
 
-        const data = await res.json();
-        if (res.ok) {
+        if (res && res.ok) {
             showNotify('Notes uploaded successfully!');
             document.getElementById('uploadForm').reset();
             document.getElementById('fileNameDisplay').classList.add('hidden');
             loadDashboardData(); // reload courses
         } else {
+            const data = await res.json();
             showNotify(data.message || 'Upload failed', 'error');
         }
     } catch (err) {
@@ -546,12 +554,13 @@ async function saveBulkAttendance() {
             method: 'POST',
             body: JSON.stringify({ module, date, records })
         });
-        const data = await res.json();
         
-        if (res.ok) {
+        if (res && res.ok) {
+            const data = await res.json();
             showNotify(data.message);
             loadDashboardData(); // reload records
-        } else {
+        } else if (res) {
+            const data = await res.json();
             showNotify(data.message || 'Error saving attendance', 'error');
         }
     } catch (err) {
@@ -577,12 +586,12 @@ document.getElementById('gradeForm')?.addEventListener('submit', async (e) => {
             method: 'POST',
             body: JSON.stringify(payload)
         });
-        const data = await res.json();
         
-        if (res.ok) {
+        if (res && res.ok) {
             showNotify('Grade posted successfully!');
             document.getElementById('gradeForm').reset();
-        } else {
+        } else if (res) {
+            const data = await res.json();
             showNotify(data.message || 'Failed to post grade', 'error');
         }
     } catch (err) {
@@ -651,3 +660,27 @@ async function exportData(type) {
         showNotify('Export failed', 'error');
     }
 }
+
+// ─── THEME TOGGLE (Local Fallback) ───
+if (typeof initTheme !== 'function') {
+    window.initTheme = function() {
+        const saved = localStorage.getItem('eemci-theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', saved);
+    }
+}
+
+function toggleTheme() {
+  const current = document.documentElement.getAttribute('data-theme');
+  const next = current === 'light' ? 'dark' : 'light';
+  applyTheme(next);
+}
+
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  localStorage.setItem('eemci-theme', theme);
+  const icon = document.getElementById('themeIcon');
+  if (icon) {
+    icon.className = theme === 'light' ? 'fas fa-sun' : 'fas fa-moon';
+  }
+}
+// ─── END THEME TOGGLE ─────────────────────────────────────────────────────

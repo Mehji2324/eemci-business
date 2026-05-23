@@ -2,6 +2,7 @@ const API_URL = '/api';
 
 // ─── AUTHENTICATION & INITIALIZATION ─────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
+    initTheme();
     const token = sessionStorage.getItem('token');
     const user = JSON.parse(sessionStorage.getItem('user'));
 
@@ -831,3 +832,25 @@ function togglePwdVisibility(id) {
         eyeIcon.classList.add('fa-eye');
     }
 }
+
+// ─── THEME TOGGLE ─────────────────────────────────────────────────────────
+function toggleTheme() {
+  const current = document.documentElement.getAttribute('data-theme');
+  const next = current === 'light' ? 'dark' : 'light';
+  applyTheme(next);
+}
+
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  localStorage.setItem('eemci-theme', theme);
+  const icon = document.getElementById('themeIcon');
+  if (icon) {
+    icon.className = theme === 'light' ? 'fas fa-sun' : 'fas fa-moon';
+  }
+}
+
+function initTheme() {
+  const saved = localStorage.getItem('eemci-theme') || 'dark';
+  applyTheme(saved);
+}
+// ─── END THEME TOGGLE ─────────────────────────────────────────────────────

@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EEMCI Platform - Administration</title>
+    <script src="theme-init.js"></script>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- Font Awesome -->
@@ -59,6 +60,10 @@
                     <p id="currentDate" class="text-muted"></p>
                 </div>
                 <div class="header-actions">
+                    <!-- Dark/Light Mode Toggle -->
+                    <button class="theme-toggle-btn" onclick="toggleThemeLogin()" title="Toggle theme" id="themeToggleBtn">
+                      <i class="fas fa-moon" id="themeIcon"></i>
+                    </button>
                     <!-- Notification Bell -->
                     <div class="notif-wrapper" style="position: relative; display: inline-block; margin-right: 1rem;">
                       <button class="btn btn-outline-light position-relative" onclick="toggleNotifDropdown()" id="notifBellBtn">
