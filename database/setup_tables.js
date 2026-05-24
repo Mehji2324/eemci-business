@@ -138,15 +138,6 @@ const seeds = [
 async function setup() {
     console.log('--- Creating EEMCI database tables ---\n');
 
-    // Force refresh these tables for development to ensure schema sync
-    const forceRefresh = ['payments', 'filiere_fees', 'students_info', 'professors_info'];
-    for (const table of forceRefresh) {
-        try {
-            await db.execute(`DROP TABLE IF EXISTS ${table}`);
-            console.log(`  [Clean] Dropped ${table}`);
-        } catch (e) {}
-    }
-
     for (const sql of tables) {
         const tableName = sql.match(/CREATE TABLE IF NOT EXISTS (\w+)/)[1];
         try {

@@ -325,9 +325,16 @@ async function initDashboard(user) {
             `;
         }
         loadAdminData();
+
+        // Handle URL tab parameter
+        const params = new URLSearchParams(window.location.search);
+        const tab = params.get('tab');
+        if (tab) {
+            const el = document.querySelector(`[onclick*="${tab}"]`);
+            switchAdminTab(tab, el);
+        }
     }
 }
-
 function updateStudentStats(grades, courses, events) {
     const statsEl = document.getElementById('statsOverview');
     if (!statsEl) return;
@@ -728,17 +735,20 @@ if (addUserForm) {
         if (res.ok) {
             const data = await res.json();
             
-            // Display credentials in the new modal with guards
-            const roleEl = document.getElementById('cred-role');
-            if (roleEl) roleEl.textContent = data.user.role.charAt(0).toUpperCase() + data.user.role.slice(1);
-            
-            const emailEl = document.getElementById('cred-email');
-            if (emailEl) emailEl.textContent = data.user.email;
-            
-            const pwdEl = document.getElementById('cred-password');
-            if (pwdEl) pwdEl.textContent = data.user.password;
-            
-            document.getElementById('credentialModal').classList.remove('hidden');
+            // Display credentials in the new modal with safety checks
+            const modal = document.getElementById('credentialModal');
+            if (modal) {
+                const roleEl = document.getElementById('cred-role');
+                if (roleEl) roleEl.textContent = data.user.role.charAt(0).toUpperCase() + data.user.role.slice(1);
+                
+                const emailEl = document.getElementById('cred-email');
+                if (emailEl) emailEl.textContent = data.user.email;
+                
+                const pwdEl = document.getElementById('cred-password');
+                if (pwdEl) pwdEl.textContent = data.user.password;
+                
+                modal.classList.remove('hidden');
+            }
             
             hideAddUserForm();
             loadAdminData();
