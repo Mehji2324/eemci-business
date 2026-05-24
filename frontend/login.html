@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EEMCI - Connexion Portail</title>
+    <script src="theme-init.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            background: #020617;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+        .ambient-glow {
+            position: fixed;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(79, 70, 229, 0.1) 0%, transparent 70%);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: -1;
+            filter: blur(80px);
+        }
+    </style>
+</head>
+<body>
+    <div class="ambient-glow"></div>
+    
+    <div class="login-box">
+        <div class="text-center">
+            <img src="logo.webp" alt="EEMCI Logo" class="login-logo">
+            <h1>Bienvenue</h1>
+            <p>Accédez à votre espace étudiant ou professionnel</p>
+        </div>
+
+        <form id="loginForm">
+            <div class="input-group-custom">
+                <i class="fas fa-envelope"></i>
+                <input type="email" id="email" placeholder="Email Académique" required>
+            </div>
+            
+            <div class="input-group-custom">
+                <i class="fas fa-lock"></i>
+                <input type="password" id="password" placeholder="Mot de passe" required>
+            </div>
+
+            <button type="submit" class="btn-login">
+                Se Connecter <i class="fas fa-arrow-right ms-2"></i>
+            </button>
+        </form>
+
+        <div class="text-center mt-4">
+            <a href="index.html" class="text-muted text-decoration-none small">
+                <i class="fas fa-chevron-left me-1"></i> Retour à l'accueil
+            </a>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
