@@ -28,7 +28,7 @@ exports.getCourses = asyncHandler(async (req, res) => {
     if (studentInfo.length === 0) return res.json([]);
 
     const [rows] = await db.execute(`
-        SELECT c.title, c.file_path, u.name as professor_name, u.email as professor_email
+        SELECT c.title, c.file_path, c.department, u.name as professor_name, u.email as professor_email, u.id as professor_id
         FROM courses c 
         JOIN users u ON c.professor_id = u.id
         WHERE c.department = ?
@@ -39,4 +39,16 @@ exports.getCourses = asyncHandler(async (req, res) => {
 exports.getEvents = asyncHandler(async (req, res) => {
     const [rows] = await db.execute('SELECT * FROM events ORDER BY date ASC');
     res.json(rows);
+});
+
+exports.getProfile = asyncHandler(async (req, res) => {
+    const [rows] = await db.execute(`
+        SELECT u.name, u.email, s.group_name, s.department, s.academic_email
+        FROM users u
+        JOIN students_info s ON u.id = s.user_id
+        WHERE u.id = ?
+    `, [req.user.id]);
+    
+    if (rows.length === 0) return res.status(404).json({ message: 'Profile not found' });
+    res.json(rows[0]);
 });

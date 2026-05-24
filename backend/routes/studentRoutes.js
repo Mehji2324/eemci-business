@@ -10,5 +10,6 @@ router.get('/grades', studentController.getGrades);
 router.get('/schedule', studentController.getSchedule);
 router.get('/courses', studentController.getCourses);
 router.get('/events', studentController.getEvents);
+router.get('/profile', studentController.getProfile);
 
 module.exports = router;

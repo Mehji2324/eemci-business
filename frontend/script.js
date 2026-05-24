@@ -322,6 +322,33 @@ async function initDashboard(user) {
     }
 }
 
+function updateStudentStats(grades, courses, events) {
+    const statsEl = document.getElementById('statsOverview');
+    if (!statsEl) return;
+
+    const avg = grades.length > 0 
+        ? (grades.reduce((acc, g) => acc + parseFloat(g.note), 0) / grades.length).toFixed(2)
+        : 'N/A';
+    
+    statsEl.innerHTML = `
+        <div class="stat-card glass">
+            <i class="fas fa-book-open fa-2x mb-2 text-primary"></i>
+            <h4>Courses</h4>
+            <div class="value">${courses.length}</div>
+        </div>
+        <div class="stat-card glass">
+            <i class="fas fa-star fa-2x mb-2 text-warning"></i>
+            <h4>Avg. Grade</h4>
+            <div class="value">${avg}/20</div>
+        </div>
+        <div class="stat-card glass">
+            <i class="fas fa-calendar-day fa-2x mb-2 text-success"></i>
+            <h4>Events</h4>
+            <div class="value">${events.length}</div>
+        </div>
+    `;
+}
+
 function quickMessage(receiverId) {
     showComposeModal();
     setTimeout(() => {
@@ -485,20 +512,26 @@ if (composeForm) {
 // ─── STUDENT FEATURES ────────────────────────────────────────────────────────
 async function loadStudentData(user) {
     try {
-        const [grades, courses, events, studySchedule, examSchedule] = await Promise.all([
+        const [grades, courses, events, studySchedule, examSchedule, profile] = await Promise.all([
             apiFetch('/student/grades').then(r => r ? r.json() : []),
             apiFetch('/student/courses').then(r => r ? r.json() : []),
             apiFetch('/student/events').then(r => r ? r.json() : []),
             apiFetch('/student/schedule?type=study').then(r => r ? r.json() : []),
-            apiFetch('/student/schedule?type=exam').then(r => r ? r.json() : [])
+            apiFetch('/student/schedule?type=exam').then(r => r ? r.json() : []),
+            apiFetch('/student/profile').then(r => r ? r.json() : null)
         ]);
 
         // Profile Display
-        if (courses.length > 0) {
+        if (profile) {
+            if (document.getElementById('studentDeptDisplay')) document.getElementById('studentDeptDisplay').textContent = profile.department;
+            if (document.getElementById('studentGroupDisplay')) document.getElementById('studentGroupDisplay').textContent = profile.group_name;
+        } else if (courses.length > 0) {
             const dept = courses[0].department || 'General';
             if (document.getElementById('studentDeptDisplay')) document.getElementById('studentDeptDisplay').textContent = dept;
         }
         if (document.getElementById('studentEmailDisplay')) document.getElementById('studentEmailDisplay').textContent = user.email;
+
+        updateStudentStats(grades, courses, events);
 
         // Grades table
         const gTable = document.querySelector('#gradesTable tbody');
