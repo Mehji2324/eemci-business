@@ -11,10 +11,13 @@ exports.getUsers = asyncHandler(async (req, res) => {
 exports.addUser = asyncHandler(async (req, res) => {
     const { name, password, role, group_name, department } = req.body;
 
-    console.log('[addUser] Payload:', { name, role, group_name, department });
-
     if (!name || !role) {
-        return res.status(400).json({ success: false, message: 'Name and Role are required' });
+        return res.status(400).json({ success: false, message: 'Name and Role are required.' });
+    }
+
+    // Validate role-specific required fields
+    if (role === 'student' && !group_name) {
+        return res.status(400).json({ success: false, message: 'Group name is required for students.' });
     }
 
     // Generate academic email with collision handling
@@ -50,55 +53,42 @@ exports.addUser = asyncHandler(async (req, res) => {
     // Generate standard password
     const generatedPassword = password || `${firstName.charAt(0).toUpperCase()}${firstName.slice(1)}@2026`;
     
+    const connection = await db.getConnection();
     try {
+        await connection.beginTransaction();
+
         const hashedPassword = await bcrypt.hash(generatedPassword, 10);
-        
-        // 1. Create Main User
-        const userId = await User.create({
-            name,
-            email: academicEmail,
-            password: hashedPassword,
-            role,
-            raw_password: generatedPassword
-        });
 
-        console.log(`[addUser] Created user ID: ${userId}`);
+        const [userResult] = await connection.execute(
+            'INSERT INTO users (name, email, password, role, raw_password) VALUES (?, ?, ?, ?, ?)',
+            [name, academicEmail, hashedPassword, role, generatedPassword]
+        );
+        const userId = userResult.insertId;
 
-        // 2. Add Role-Specific Info
         if (role === 'student') {
-            await db.execute(
-                'INSERT INTO students_info (user_id, group_name, department, academic_email) VALUES (?, ?, ?, ?)', 
-                [userId, group_name || 'N/A', department || 'Développement Informatique', academicEmail]
+            await connection.execute(
+                'INSERT INTO students_info (user_id, group_name, department, academic_email) VALUES (?, ?, ?, ?)',
+                [userId, group_name, department || 'Développement Informatique', academicEmail]
             );
         } else if (role === 'professor') {
-            await db.execute(
-                'INSERT INTO professors_info (user_id, academic_email, department) VALUES (?, ?, ?)', 
+            await connection.execute(
+                'INSERT INTO professors_info (user_id, academic_email, department) VALUES (?, ?, ?)',
                 [userId, academicEmail, department || 'Développement Informatique']
             );
         }
 
-        return res.status(201).json({ 
-            success: true, 
-            message: 'User created successfully', 
-            user: { 
-                email: academicEmail, 
-                password: generatedPassword, 
-                role 
-            } 
-        });
+        await connection.commit();
+        return res.status(201).json({ success: true, message: 'User created.', user: { email: academicEmail, password: generatedPassword, role } });
 
     } catch (err) {
-        console.error('[addUser] CRITICAL ERROR:', err);
-        
+        await connection.rollback();
+        console.error('[addUser] Transaction rolled back:', err.message);
         if (err.code === 'ER_DUP_ENTRY') {
-            return res.status(400).json({ success: false, message: 'This academic email already exists in the system.' });
+            return res.status(400).json({ success: false, message: 'This academic email already exists.' });
         }
-
-        return res.status(500).json({ 
-            success: false, 
-            message: 'Internal Database Error', 
-            error: err.message 
-        });
+        return res.status(500).json({ success: false, message: 'Database transaction failed.', error: err.message });
+    } finally {
+        connection.release();
     }
 });
 

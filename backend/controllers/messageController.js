@@ -24,7 +24,7 @@ exports.sendMessage = asyncHandler(async (req, res) => {
     await createNotification(
       receiver_id,
       'message',
-      '📩 New Message',
+      'New Message Received',
       `${senderName} sent you a message: "${subject || '(No Subject)'}"` 
     );
 

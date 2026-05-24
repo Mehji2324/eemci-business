@@ -1,80 +1,232 @@
-/* Payment Dashboard Styles - EEMCI Dark Theme */
-#cardContainer {
+/* ─── PAYMENT MODULE STYLES ────────────────────────────────────────────────── */
+
+/* Filière Tab Bar — Ink Bar Animation */
+.filiere-tab-bar {
+    position: relative;
+    display: flex;
+    gap: 0.5rem;
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 0;
+    margin-bottom: 1.5rem;
+}
+
+.tab-ink-bar {
+    position: absolute;
+    bottom: -2px;
+    height: 2px;
+    background: linear-gradient(90deg, var(--primary), var(--secondary));
+    transition: left 300ms cubic-bezier(0.4, 0, 0.2, 1),
+                width 300ms cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 2px;
+    will-change: left, width;
+}
+
+.filiere-tab {
+    position: relative;
+    background: transparent;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    cursor: pointer;
+    border-radius: 12px 12px 0 0;
+    transition: color 200ms ease, background 200ms ease;
+    white-space: nowrap;
+}
+
+.filiere-tab.active { color: var(--text-primary); }
+.filiere-tab:hover:not(.active) { background: var(--bg-card); color: var(--text-primary); }
+
+.tab-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 22px;
+    height: 22px;
+    padding: 0 6px;
+    border-radius: 100px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    background: var(--bg-card);
+    color: var(--text-secondary);
+    margin-left: 8px;
+    transition: background 300ms, color 300ms;
+}
+
+.filiere-tab.active .tab-count {
+    background: var(--primary);
+    color: #fff;
+}
+
+/* Table Row Staggered Entry Animation */
+@keyframes rowEnter {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.payment-row {
+    animation: rowEnter 240ms ease-out both;
+}
+
+/* Balance Cell — RED highlight for deficit */
+.balance-cell.has-deficit {
+    color: var(--danger) !important;
+    font-weight: 700;
+}
+
+.balance-cell.has-deficit::before {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--danger);
+    margin-right: 6px;
+    vertical-align: middle;
+}
+
+.balance-cell.cleared {
+    color: var(--accent);
+    font-weight: 600;
+}
+
+/* Status Badge */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: 100px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+}
+
+.status-badge.paid    { background: rgba(16,185,129,0.15); color: #10b981; }
+.status-badge.partial { background: rgba(245,158,11,0.15); color: #f59e0b; }
+.status-badge.pending { background: rgba(239,68,68,0.12);  color: var(--danger); }
+
+/* Save/Record Button Micro-interaction */
+.btn-record { position: relative; min-width: 90px; overflow: hidden; transition: all 200ms ease; }
+.btn-record.loading { pointer-events: none; opacity: 0.7; }
+.btn-record.success { background: var(--accent) !important; }
+
+/* CSS spinner for loading state */
+.btn-record.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 16px; height: 16px;
+    margin: -8px 0 0 -8px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Skeleton Loaders */
+@keyframes shimmer {
+    from { background-position: 200% 0; }
+    to   { background-position: -200% 0; }
+}
+
+.skeleton-row td {
+    padding: 1.25rem 1.5rem;
+}
+
+.skeleton-cell {
+    height: 16px;
+    border-radius: 8px;
+    background: linear-gradient(90deg, var(--bg-card) 25%, rgba(255,255,255,0.06) 50%, var(--bg-card) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.4s linear infinite;
+}
+
+/* Payment History Modal Animation */
+.custom-modal:not(.hidden) .modal-content {
+    animation: modalIn 220ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes modalIn {
+    from { opacity: 0; transform: scale(0.95) translateY(10px); }
+    to   { opacity: 1; transform: scale(1)    translateY(0); }
+}
+
+/* Fee Configuration Cards */
+.fee-config-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 1.5rem;
 }
 
-.card {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 16px;
-    padding: 1.5rem;
-    backdrop-filter: blur(10px);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.card:hover {
-    transform: translateY(-5px);
-    border-color: var(--primary);
-    box-shadow: 0 10px 30px rgba(79, 70, 229, 0.2);
-}
-
-.card.stagger {
-    opacity: 0;
-    animation: slideUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-}
-
-@keyframes slideUp {
-    from { opacity: 0; transform: translateY(30px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-/* Modal Styling */
-.modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.8);
-    backdrop-filter: blur(8px);
-    z-index: 1050;
+.fee-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    padding: 1.75rem;
     display: flex;
-    align-items: center;
-    justify-content: center;
+    flex-direction: column;
+    gap: 1rem;
+    transition: border-color 200ms, box-shadow 200ms;
 }
 
-.modal.hidden {
-    display: none;
+.fee-card:hover { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(79,70,229,0.08); }
+.fee-card .fee-label { font-weight: 700; font-size: 1rem; color: var(--text-primary); }
+.fee-card .fee-input-row { display: flex; gap: 0.75rem; align-items: center; }
+.fee-card .fee-input { max-width: 140px; }
+
+/* Summary Bar */
+.payment-summary-bar {
+    display: flex; flex-wrap: wrap; gap: 0.75rem;
+    margin-bottom: 1.5rem;
 }
 
-.modal-content {
-    background: #1e293b;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 24px;
-    padding: 2rem;
-    width: 90%;
-    max-width: 600px;
-    color: white;
+.summary-chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 14px; border-radius: 100px;
+    font-size: 0.82rem; font-weight: 600;
+    border: 1px solid var(--border-color);
+    background: var(--bg-card);
+    color: var(--text-secondary);
+    transition: all 200ms ease;
 }
 
-.close {
-    cursor: pointer;
-    font-size: 1.5rem;
-    color: #94a3b8;
+.summary-chip.paid    { border-color: rgba(16,185,129,0.3); color: #10b981; }
+.summary-chip.partial { border-color: rgba(245,158,11,0.3); color: #f59e0b; }
+.summary-chip.pending { border-color: rgba(239,68,68,0.3);  color: var(--danger); }
+.summary-chip.total   { border-color: var(--primary); color: var(--text-primary); }
+
+/* Layout adjustments */
+.payment-controls-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 1.5rem;
 }
 
-.close:hover {
-    color: white;
+.payment-filters {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
 }
 
-/* Tabs */
-#tabs .btn.active {
-    background: currentColor;
-    color: #000 !important;
-    font-weight: bold;
+.search-box {
+    position: relative;
+    width: 240px;
 }
 
-.btn-outline-warning.active { color: #ffc107; border-color: #ffc107; }
-.btn-outline-success.active { color: #198754; border-color: #198754; }
+.search-icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-secondary);
+}
+
+.search-box input {
+    padding-left: 2.8rem !important;
+}

@@ -51,7 +51,13 @@
     color: var(--text-main);
 }
 *, *::before, *::after {
-    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+    transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Apply color transitions only where needed */
+a, aside ul li, .btn, .logout-btn, .nav-link, .notif-item {
+    transition: background-color 0.2s ease, color 0.2s ease,
+                border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 
@@ -448,6 +454,46 @@ header {
     border-left: 4px solid var(--primary) !important;
 }
 
+/* ─── ADMIN TAB TRANSITIONS ────────────────────────────────────────────────── */
+.section-content {
+    animation: sectionFadeIn 280ms ease-out both;
+}
+@keyframes sectionFadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+.section-content.hidden {
+    display: none !important;
+}
+
+/* Sidebar item transition improvement */
+aside ul li {
+    transition: background 200ms cubic-bezier(0.4, 0, 0.2, 1),
+                color 200ms ease,
+                box-shadow 200ms ease,
+                transform 150ms ease;
+}
+aside ul li:active {
+    transform: scale(0.97);
+}
+
+/* Table row hover glow */
+.table tbody tr {
+    transition: background 200ms ease, box-shadow 200ms ease;
+}
+.table tbody tr:hover {
+    background: var(--bg-card);
+    box-shadow: 0 2px 12px rgba(79, 70, 229, 0.08);
+}
+
+/* Content card entrance */
+.content-card {
+    animation: cardEntrance 350ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@keyframes cardEntrance {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
 /* --- Admin Specifics --- */
 .top-nav {
     height: 80px;
@@ -455,8 +501,25 @@ header {
     align-items: center;
     justify-content: space-between;
     padding: 0 2rem;
-    background: var(--sidebar-bg);
+    background: var(--bg-card);
     border-bottom: 1px solid var(--border-color);
+}
+
+/* SweetAlert Toast Visibility Fix */
+.swal2-toast {
+    background: #1e293b !important;
+    border: 1px solid var(--border-color) !important;
+    color: #ffffff !important;
+}
+
+.swal2-toast .swal2-title {
+    color: #ffffff !important;
+}
+
+.swal2-toast .swal2-success-circular-line,
+.swal2-toast .swal2-success-fix {
+    background-color: transparent !important;
+}
     position: sticky;
     top: 0;
     z-index: 99;
@@ -494,9 +557,14 @@ input:focus, select:focus, textarea:focus {
 }
 .btn-primary { 
     background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); 
-    color: var(--text-primary); 
+    color: #ffffff !important; 
+    border: none;
 }
-.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 15px rgba(79, 70, 229, 0.4); }
+.btn-primary:hover, .btn-primary:focus, .btn-primary:active { 
+    color: #ffffff !important;
+    transform: translateY(-2px); 
+    box-shadow: 0 10px 15px rgba(79, 70, 229, 0.4); 
+}
 
 .alert-primary {
     background: rgba(79, 70, 229, 0.1);

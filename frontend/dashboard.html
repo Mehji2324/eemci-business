@@ -79,7 +79,7 @@
             <!-- Global Mailbox Section -->
             <div id="mailboxSection" class="section-content hidden">
                 <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h3>📩 Internal Mailbox</h3>
+                    <h3><i class="fas fa-envelope me-2 text-primary"></i> Internal Mailbox</h3>
                     <button class="btn btn-primary" onclick="showComposeModal()"><i class="fas fa-paper-plane"></i> New Message</button>
                 </div>
                 
@@ -114,7 +114,7 @@
                 <!-- Overview Section -->
                 <div id="studentOverview" class="section-content">
                     <div class="content-card glass">
-                        <h3>🎓 Student Profile</h3>
+                        <h3><i class="fas fa-user-graduate me-2 text-primary"></i> Student Profile</h3>
                         <div class="profile-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
                             <div>
                                 <p style="color: var(--text-muted)">Department</p>
@@ -135,7 +135,7 @@
                 <!-- Grades Section -->
                 <div id="studentGrades" class="section-content hidden">
                     <div class="content-card glass">
-                        <h3>📊 Academic Performance</h3>
+                        <h3><i class="fas fa-chart-line me-2 text-warning"></i> Academic Performance</h3>
                         <div class="table-container">
                             <table id="gradesTable" class="table table-hover align-middle">
                                 <thead><tr><th>Module</th><th>Note / 20</th><th>Status</th></tr></thead>
@@ -148,7 +148,7 @@
                 <!-- Study Schedule Section -->
                 <div id="studentStudySchedule" class="section-content hidden">
                     <div class="content-card glass">
-                        <h3>🗓️ Weekly Study Plan</h3>
+                        <h3><i class="fas fa-calendar-alt me-2 text-info"></i> Weekly Study Plan</h3>
                         <div class="table-container">
                             <table id="scheduleTable" class="table table-hover align-middle">
                                 <thead><tr><th>Day</th><th>Time</th><th>Module</th></tr></thead>
@@ -161,7 +161,7 @@
                 <!-- Exam Schedule Section -->
                 <div id="studentExamSchedule" class="section-content hidden">
                     <div class="content-card glass">
-                        <h3>📝 Examination Schedule</h3>
+                        <h3><i class="fas fa-file-alt me-2 text-danger"></i> Examination Schedule</h3>
                         <div class="table-container">
                             <table id="examScheduleTable" class="table table-hover align-middle">
                                 <thead><tr><th>Date</th><th>Time</th><th>Module</th></tr></thead>
@@ -173,13 +173,13 @@
 
                 <!-- Courses Section -->
                 <div id="studentCourses" class="section-content hidden">
-                    <h3>📚 My Courses</h3>
+                    <h3><i class="fas fa-book me-2 text-success"></i> My Courses</h3>
                     <div id="studentCoursesList" class="course-grid"></div>
                 </div>
 
                 <!-- Events & Plans Section -->
                 <div id="studentEvents" class="section-content hidden">
-                    <h3>📅 School Events & Plans</h3>
+                    <h3><i class="fas fa-bullhorn me-2 text-primary"></i> School Events & Plans</h3>
                     <div id="eventsContainer" class="course-grid"></div>
                 </div>
             </div>
@@ -208,7 +208,7 @@
                 <div class="grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
                     <!-- Attendance Section -->
                     <div class="content-card glass">
-                        <h3>✅ Mark Attendance</h3>
+                        <h3><i class="fas fa-check-circle me-2 text-success"></i> Mark Attendance</h3>
                         <form id="attendanceForm">
                             <select id="attnStudentSelect" required><option value="">Select Student</option></select>
                             <input type="text" id="attnModule" placeholder="Module / Class Name" required>
@@ -223,7 +223,7 @@
 
                     <!-- Grade Section -->
                     <div class="content-card glass">
-                        <h3>📝 Post Grades / Exams</h3>
+                        <h3><i class="fas fa-pen-alt me-2 text-warning"></i> Post Grades / Exams</h3>
                         <form id="gradeForm">
                             <select id="studentSelect" required><option value="">Select Student</option></select>
                             <input type="text" id="gradeModule" placeholder="Module Name" required>
@@ -239,7 +239,7 @@
 
                 <!-- Course Upload Section -->
                 <div class="content-card glass">
-                    <h3>📤 Share Resources</h3>
+                    <h3><i class="fas fa-cloud-upload-alt me-2 text-primary"></i> Share Resources</h3>
                     <form id="uploadForm" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
                         <div>
                             <input type="text" id="courseTitle" placeholder="Document Title (e.g. Lec 1: Networking)" required>
@@ -262,7 +262,7 @@
                 <!-- Statistics Tab -->
                 <div id="stats-mgmt" class="section-content hidden">
                     <div class="content-card glass">
-                        <h3>📈 Platform Overview</h3>
+                        <h3><i class="fas fa-chart-pie me-2 text-primary"></i> Platform Overview</h3>
                         <div id="statsCards" class="row g-4 mb-4">
                             <!-- Stats injected via JS -->
                         </div>
@@ -287,7 +287,7 @@
                 <div id="user-mgmt" class="section-content">
                     <div class="content-card glass">
                         <div class="d-flex justify-content-between align-items-center mb-4">
-                            <h3>👥 User Management</h3>
+                            <h3><i class="fas fa-users me-2 text-primary"></i> User Management</h3>
                             <button onclick="showAddUserForm()" class="btn btn-primary"><i class="fas fa-plus me-2"></i> Add New User</button>
                         </div>
                         <div class="table-container">

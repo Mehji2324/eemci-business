@@ -1,67 +1,78 @@
-/**
- * Payment Controller (MySQL Version - Enhanced for Balance Tracking)
- */
-const db = require('../config/db');
+const Payment = require('../models/Payment');
 const asyncHandler = require('../utils/asyncHandler');
 
-exports.fetchPayments = asyncHandler(async (req, res) => {
-    const { month, year } = req.query;
-    if (!month || !year) {
-        return res.status(400).json({ message: 'Month and year are required' });
-    }
-
-    const [rows] = await db.execute(`
-        SELECT u.id as student_id, u.name, u.email, si.group_name,
-               p.status, p.total_amount, p.paid_amount, p.paid_at
-        FROM users u
-        JOIN students_info si ON u.id = si.user_id
-        LEFT JOIN payments p ON u.id = p.student_id AND p.month = ? AND p.year = ?
-        WHERE u.role = 'student'
-        ORDER BY si.group_name, u.name
-    `, [month, year]);
-
-    const formatted = rows.map(r => ({
-        student_id: { id: r.student_id, name: r.name, email: r.email, group_name: r.group_name },
-        status: r.status || 'pending',
-        total_amount: r.total_amount || 0,
-        paid_amount: r.paid_amount || 0,
-        paid_at: r.paid_at
-    }));
-
-    res.json(formatted);
+/**
+ * GET /api/payments/fees
+ * Returns fee configuration for all filières
+ */
+exports.getAllFees = asyncHandler(async (req, res) => {
+    const fees = await Payment.getAllFees();
+    res.json({ success: true, data: fees });
 });
 
-exports.updateStatus = asyncHandler(async (req, res) => {
-    const { studentId, month, year, status, total_amount, paid_amount } = req.body;
+/**
+ * PUT /api/payments/fees
+ * Body: { filiere, monthly_fee }
+ * Admin sets the monthly fee for a filière
+ */
+exports.updateFee = asyncHandler(async (req, res) => {
+    const { filiere, monthly_fee } = req.body;
+    if (!filiere || monthly_fee === undefined) {
+        return res.status(400).json({ success: false, message: 'Filière and fee amount are required.' });
+    }
+    await Payment.updateFee(filiere, parseFloat(monthly_fee));
+    res.json({ success: true, message: 'Fee updated successfully.' });
+});
+
+/**
+ * GET /api/payments/students?filiere=...&month=...&year=...
+ * Returns students with payment status for the given criteria
+ */
+exports.getStudentsByFiliere = asyncHandler(async (req, res) => {
+    const { filiere, month, year } = req.query;
+    if (!filiere || !month || !year) {
+        return res.status(400).json({ success: false, message: 'filiere, month, and year are required.' });
+    }
+    const students = await Payment.getStudentsWithPayments(filiere, parseInt(month), parseInt(year));
+    res.json({ success: true, data: students });
+});
+
+/**
+ * PUT /api/payments/record
+ * Body: { student_id, filiere, month, year, amount_paid }
+ * Records or updates a payment entry
+ */
+exports.recordPayment = asyncHandler(async (req, res) => {
+    const { student_id, filiere, month, year, amount_paid } = req.body;
     
-    if (!studentId || !month || !year || !status) {
-        return res.status(400).json({ message: 'Missing required fields' });
+    if (!student_id || !filiere || !month || !year || amount_paid === undefined) {
+        return res.status(400).json({ success: false, message: 'All fields are required.' });
     }
 
-    const paidAt = status === 'paid' ? new Date() : null;
-    const total = parseFloat(total_amount) || 0;
-    const paid = parseFloat(paid_amount) || 0;
+    const feeConfig = await Payment.getFeeByFiliere(filiere);
+    if (!feeConfig) {
+        return res.status(404).json({ success: false, message: 'Filière fee not configured.' });
+    }
 
-    await db.execute(`
-        INSERT INTO payments (student_id, month, year, status, paid_at, total_amount, paid_amount)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-        ON DUPLICATE KEY UPDATE 
-            status = VALUES(status), 
-            paid_at = VALUES(paid_at),
-            total_amount = VALUES(total_amount),
-            paid_amount = VALUES(paid_amount)
-    `, [studentId, month, year, status, paidAt, total, paid]);
+    await Payment.upsertPayment(
+        student_id, 
+        filiere, 
+        parseInt(month), 
+        parseInt(year),
+        parseFloat(amount_paid), 
+        feeConfig.monthly_fee, 
+        req.user.id
+    );
 
-    res.json({ success: true, message: 'Payment updated' });
+    res.json({ success: true, message: 'Payment recorded successfully.' });
 });
 
-exports.fetchHistory = asyncHandler(async (req, res) => {
+/**
+ * GET /api/payments/history/:studentId
+ * Returns payment history for a specific student
+ */
+exports.getStudentHistory = asyncHandler(async (req, res) => {
     const { studentId } = req.params;
-    const [rows] = await db.execute(`
-        SELECT * FROM payments 
-        WHERE student_id = ? 
-        ORDER BY year DESC, month DESC
-    `, [studentId]);
-    
-    res.json(rows);
+    const history = await Payment.getPaymentHistory(studentId);
+    res.json({ success: true, data: history });
 });

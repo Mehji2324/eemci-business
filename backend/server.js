@@ -50,5 +50,5 @@ app.get(/^(?!\/api).*$/, (req, res) => {
 app.use(errorMiddleware);
 
 app.listen(PORT, () => {
-    console.log(`🚀 Server on port ${PORT}`);
+    console.log(`Server running on port ${PORT}`);
 });

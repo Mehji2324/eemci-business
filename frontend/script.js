@@ -70,14 +70,14 @@ let notifOpen = false;
 let notifPollInterval = null;
 
 function getNotifIcon(type) {
-  const icons = {
-    message: '📩',
-    event: '📅',
-    course: '📚',
-    grade: '📊',
-    general: '🔔'
-  };
-  return icons[type] || '🔔';
+    const icons = {
+        message: '<i class="fas fa-envelope" style="color:var(--secondary)"></i>',
+        event:   '<i class="fas fa-calendar-alt" style="color:var(--primary)"></i>',
+        course:  '<i class="fas fa-book-open" style="color:var(--accent)"></i>',
+        grade:   '<i class="fas fa-chart-bar" style="color:#f59e0b"></i>',
+        general: '<i class="fas fa-bell" style="color:var(--text-secondary)"></i>'
+    };
+    return icons[type] || icons.general;
 }
 
 function getNotifTypeLabel(type) {
@@ -108,7 +108,7 @@ async function loadNotifications() {
     if (!list) return;
 
     if (notifs.length === 0) {
-      list.innerHTML = '<div class="notif-empty">🔔 No notifications yet</div>';
+      list.innerHTML = '<div class="notif-empty"><i class="fas fa-bell-slash me-2"></i>No notifications yet</div>';
       return;
     }
 
@@ -116,9 +116,9 @@ async function loadNotifications() {
       <div class="notif-item ${n.is_read ? '' : 'unread'}" onclick="handleNotifClick(${n.id}, '${n.type}')">
         <div class="notif-icon">${getNotifIcon(n.type)}</div>
         <div class="notif-body">
-          <strong>${n.title}</strong>
-          <p style="margin:0; font-size:0.82rem; color:rgba(255,255,255,0.7);">${n.message}</p>
-          <span>${getNotifTypeLabel(n.type)} · ${timeAgo(n.created_at)}</span>
+          <div class="notif-title">${n.title || getNotifTypeLabel(n.type)}</div>
+          <p class="notif-msg">${n.message || ''}</p>
+          <span class="notif-time">${new Date(n.created_at).toLocaleDateString()}</span>
         </div>
       </div>
     `).join('');
@@ -200,8 +200,12 @@ async function apiFetch(endpoint, options = {}) {
     const headers = { ...options.headers };
     if (token) headers['Authorization'] = `Bearer ${token}`;
     
-    // If body is NOT FormData, default to JSON content-type
-    if (!(options.body instanceof FormData) && !headers['Content-Type']) {
+    // If body is FormData, delete Content-Type entirely so the browser can set
+    // the correct multipart/form-data boundary automatically.
+    // If body is not FormData and no Content-Type set, default to JSON.
+    if (options.body instanceof FormData) {
+        delete headers['Content-Type'];
+    } else if (!headers['Content-Type']) {
         headers['Content-Type'] = 'application/json';
     }
 
@@ -286,7 +290,8 @@ async function initDashboard(user) {
 
     const menu = document.getElementById('sidebarMenu');
     if (user.role === 'student') {
-        document.getElementById('studentSection').classList.remove('hidden');
+        const studentSec = document.getElementById('studentSection');
+        if (studentSec) studentSec.classList.remove('hidden');
         if (menu) {
             menu.innerHTML = `
                 <li onclick="switchStudentSection('studentOverview', this)" class="active"><i class="fas fa-user"></i> Overview</li>
@@ -301,7 +306,8 @@ async function initDashboard(user) {
         loadStudentData(user);
     }
     else if (user.role === 'professor') {
-        document.getElementById('professorSection').classList.remove('hidden');
+        const profSec = document.getElementById('professorSection');
+        if (profSec) profSec.classList.remove('hidden');
         loadProfessorData();
     }
     else if (user.role === 'admin') {
@@ -367,12 +373,25 @@ function switchStudentSection(sectionId, el) {
 }
 
 function switchAdminTab(id, el) {
-    document.querySelectorAll('#adminSection .section-content, #mailboxSection').forEach(s => s?.classList.add('hidden'));
+    // Hide all sections
+    document.querySelectorAll('#adminSection .section-content, #mailboxSection')
+        .forEach(s => s?.classList.add('hidden'));
+
+    // Show target with re-trigger animation
     const target = document.getElementById(id);
-    if (target) target.classList.remove('hidden');
-    
+    if (target) {
+        target.classList.remove('hidden');
+        // Re-trigger CSS animation by forcing reflow
+        void target.offsetWidth;
+        target.style.animation = 'none';
+        requestAnimationFrame(() => {
+            target.style.animation = '';
+        });
+    }
+
+    // Update active state
     document.querySelectorAll('#sidebarMenu li').forEach(li => li.classList.remove('active'));
-    el.classList.add('active');
+    if (el) el.classList.add('active');
 
     if (id === 'mailboxSection') loadInbox();
 }
@@ -709,17 +728,23 @@ if (addUserForm) {
         if (res.ok) {
             const data = await res.json();
             
-            // Display credentials in the new modal
-            document.getElementById('cred-role').textContent = data.user.role.charAt(0).toUpperCase() + data.user.role.slice(1);
-            document.getElementById('cred-email').textContent = data.user.email;
-            document.getElementById('cred-password').textContent = data.user.password;
+            // Display credentials in the new modal with guards
+            const roleEl = document.getElementById('cred-role');
+            if (roleEl) roleEl.textContent = data.user.role.charAt(0).toUpperCase() + data.user.role.slice(1);
+            
+            const emailEl = document.getElementById('cred-email');
+            if (emailEl) emailEl.textContent = data.user.email;
+            
+            const pwdEl = document.getElementById('cred-password');
+            if (pwdEl) pwdEl.textContent = data.user.password;
             
             document.getElementById('credentialModal').classList.remove('hidden');
             
             hideAddUserForm();
             loadAdminData();
             addUserForm.reset();
-            document.getElementById('emailPreviewBox').classList.add('d-none');
+            const previewBox = document.getElementById('emailPreviewBox');
+            if (previewBox) previewBox.classList.add('d-none');
         } else {
             const errorData = await res.json();
             Swal.fire({

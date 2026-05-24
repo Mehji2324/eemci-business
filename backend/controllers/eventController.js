@@ -24,7 +24,7 @@ exports.createEvent = asyncHandler(async (req, res) => {
       await createNotification(
         user.id,
         'event',
-        '📅 New Event Added',
+        'New Event Published',
         `A new event has been published: "${title}"`
       );
     }

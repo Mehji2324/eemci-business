@@ -265,7 +265,7 @@ async function viewMessage(msg, type) {
     detailView.classList.remove('hidden');
 
     detailView.innerHTML = `
-        <button class="btn btn-sm btn-link mb-3 p-0 text-decoration-none" onclick="backToMailList('${type}')">← Back to ${type}</button>
+        <button class="btn btn-sm btn-link mb-3 p-0 text-decoration-none" onclick="backToMailList('${type}')"><i class="fas fa-arrow-left me-1"></i> Back to ${type}</button>
         <div class="border-bottom pb-3 mb-3">
             <h4 class="mb-1">${msg.subject}</h4>
             <div class="d-flex justify-content-between align-items-center">

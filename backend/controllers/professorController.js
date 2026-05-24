@@ -27,7 +27,7 @@ exports.uploadCourse = asyncHandler(async (req, res) => {
       await createNotification(
         student.id,
         'course',
-        '📚 New Course Available',
+        'New Course Available',
         `${profName} uploaded a new course: "${title}"`
       );
     }

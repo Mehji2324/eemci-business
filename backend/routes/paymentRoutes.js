@@ -1,13 +1,16 @@
-/**
- * Payment Routes
- */
 const express = require('express');
 const router = express.Router();
 const paymentController = require('../controllers/paymentController');
-const { authMiddleware: protect } = require('../middleware/auth');
+const { authMiddleware, roleMiddleware } = require('../middleware/auth');
 
-router.get('/', protect, paymentController.fetchPayments);
-router.put('/status', protect, paymentController.updateStatus);
-router.get('/history/:studentId', protect, paymentController.fetchHistory);
+// All payment routes require admin authentication
+router.use(authMiddleware);
+router.use(roleMiddleware(['admin']));
+
+router.get('/fees', paymentController.getAllFees);
+router.put('/fees', paymentController.updateFee);
+router.get('/students', paymentController.getStudentsByFiliere);
+router.put('/record', paymentController.recordPayment);
+router.get('/history/:studentId', paymentController.getStudentHistory);
 
 module.exports = router;

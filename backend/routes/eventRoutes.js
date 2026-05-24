@@ -2,12 +2,19 @@ const express = require('express');
 const router = express.Router();
 const multer = require('multer');
 const path = require('path');
+const fs = require('fs');
 const eventController = require('../controllers/eventController');
 const { authMiddleware, roleMiddleware } = require('../middleware/auth');
 
+// Ensure uploads directory exists at startup
+const uploadsDir = path.join(__dirname, '..', 'uploads');
+if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir, { recursive: true });
+}
+
 // Multer Storage
 const storage = multer.diskStorage({
-    destination: (req, file, cb) => cb(null, path.join(__dirname, '..', 'uploads')),
+    destination: (req, file, cb) => cb(null, uploadsDir),
     filename: (req, file, cb) => cb(null, `plan-${Date.now()}${path.extname(file.originalname)}`)
 });
 const upload = multer({ storage });

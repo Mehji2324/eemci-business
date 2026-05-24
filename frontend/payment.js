@@ -1,222 +1,382 @@
-/**
- * Payment Module - Client side logic (Enhanced with Balance Tracking)
- */
-const state = { data: [], currentTab: 'pending' };
+(function() {
+'use strict';
 
-document.addEventListener('DOMContentLoaded', () => {
-    initFilters();
-    fetchPayments();
-});
-
-function initFilters() {
-    const mSelect = document.getElementById('monthSelect');
-    const ySelect = document.getElementById('yearSelect');
-    const searchInput = document.getElementById('searchInput');
-
-    const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-    const currentMonth = new Date().getMonth() + 1;
-    const currentYear = new Date().getFullYear();
-
-    if (mSelect) {
-        mSelect.innerHTML = months.map((m, i) => `<option value="${i + 1}" ${i + 1 === currentMonth ? 'selected' : ''}>${m}</option>`).join('');
-        mSelect.onchange = fetchPayments;
-    }
-
-    if (ySelect) {
-        ySelect.innerHTML = [currentYear - 1, currentYear, currentYear + 1].map(y => `<option value="${y}" ${y === currentYear ? 'selected' : ''}>${y}</option>`).join('');
-        ySelect.onchange = fetchPayments;
-    }
-
-    if (searchInput) {
-        searchInput.oninput = render;
-    }
+// ─── AUTH GUARD ──────────────────────────────────────────────────────────────
+// script.js only guards files with 'dashboard.html' in the path.
+// We guard this page manually.
+const _token = sessionStorage.getItem('token');
+const _user  = JSON.parse(sessionStorage.getItem('user') || 'null');
+if (!_token || !_user || _user.role !== 'admin') {
+    window.location.href = 'index.html';
 }
 
-async function fetchPayments() {
-    renderSkeletons(5);
-    const m = document.getElementById('monthSelect').value;
-    const y = document.getElementById('yearSelect').value;
-    
-    try {
-        const res = await apiFetch(`/payments?month=${m}&year=${y}`);
-        if (res.ok) {
-            state.data = await res.json();
-            render();
-        }
-    } catch (e) {
-        showNotify('Failed to load payments', 'error');
-    } finally {
-        hideSkeletons();
-    }
+// ─── STATE ───────────────────────────────────────────────────────────────────
+const state = {
+    activeFiliere: 'Développement Informatique',
+    month: new Date().getMonth() + 1,        // 1-12
+    year:  new Date().getFullYear(),
+    searchQuery: '',
+    fees: {},            // { 'Développement Informatique': 1500, ... }
+    students: [],        // raw list for current filiere/month/year
+    filtered: [],        // after search filter
+    loading: false
+};
+
+// ─── API LAYER ───────────────────────────────────────────────────────────────
+async function fetchFees() {
+    return await apiFetch('/payments/fees');
 }
 
-async function openPayModal(studentId, name, currentTotal, currentPaid) {
-    const { value: formValues } = await Swal.fire({
-        title: `Payment for ${name}`,
-        html:
-            `<div class="text-start mb-2"><label class="small fw-bold">Total Due (MAD)</label></div>` +
-            `<input id="swal-total" class="swal2-input mt-0" placeholder="Total Due" value="${currentTotal || 0}">` +
-            `<div class="text-start mb-2 mt-3"><label class="small fw-bold">Amount Paid (MAD)</label></div>` +
-            `<input id="swal-paid" class="swal2-input mt-0" placeholder="Amount Paid" value="${currentPaid || 0}">`,
-        focusConfirm: false,
-        showCancelButton: true,
-        confirmButtonText: 'Save Payment',
-        preConfirm: () => {
-            return {
-                total: document.getElementById('swal-total').value,
-                paid: document.getElementById('swal-paid').value
-            }
-        }
+async function saveFee(filiere, amount) {
+    return await apiFetch('/payments/fees', {
+        method: 'PUT',
+        body: JSON.stringify({ filiere, monthly_fee: amount })
     });
-
-    if (formValues) {
-        const status = parseFloat(formValues.paid) >= parseFloat(formValues.total) && parseFloat(formValues.total) > 0 ? 'paid' : 'pending';
-        updatePayment(studentId, status, formValues.total, formValues.paid);
-    }
 }
 
-async function updatePayment(studentId, status, total_amount, paid_amount) {
-    const m = document.getElementById('monthSelect').value;
-    const y = document.getElementById('yearSelect').value;
-
-    try {
-        const res = await apiFetch('/payments/status', {
-            method: 'PUT',
-            body: JSON.stringify({ 
-                studentId, 
-                month: m, 
-                year: y, 
-                status, 
-                total_amount, 
-                paid_amount 
-            })
-        });
-        
-        if (res.ok) {
-            showNotify(`Payment updated!`);
-            fetchPayments();
-        }
-    } catch (e) {
-        showNotify('Update failed', 'error');
-    }
+async function fetchStudents(filiere, month, year) {
+    return await apiFetch(`/payments/students?filiere=${encodeURIComponent(filiere)}&month=${month}&year=${year}`);
 }
 
-function render() {
-    const search = document.getElementById('searchInput').value.toLowerCase();
-    const container = document.getElementById('cardContainer');
-    
-    const filtered = state.data.filter(p => {
-        const matchesTab = p.status === state.currentTab;
-        const matchesSearch = p.student_id.name.toLowerCase().includes(search) || 
-                              p.student_id.email.toLowerCase().includes(search);
-        return matchesTab && matchesSearch;
+async function recordPayment(studentId, filiere, month, year, amountPaid) {
+    return await apiFetch('/payments/record', {
+        method: 'PUT',
+        body: JSON.stringify({ student_id: studentId, filiere, month, year, amount_paid: amountPaid })
     });
+}
 
-    if (filtered.length === 0) {
-        container.innerHTML = `<div class="text-center w-100 py-5 text-muted">No ${state.currentTab} payments found.</div>`;
+async function fetchHistory(studentId) {
+    return await apiFetch(`/payments/history/${studentId}`);
+}
+
+// ─── RENDER LAYER ────────────────────────────────────────────────────────────
+function renderSkeletons(count) {
+    const container = document.getElementById('paymentTableBody');
+    if (!container) return;
+    container.innerHTML = '';
+    for (let i = 0; i < count; i++) {
+        const tr = document.createElement('tr');
+        tr.className = 'skeleton-row';
+        tr.innerHTML = Array(7).fill('<td><div class="skeleton-cell"></div></td>').join('');
+        container.appendChild(tr);
+    }
+}
+
+function hideSkeletons() {
+    document.querySelectorAll('.skeleton-row').forEach(r => r.remove());
+}
+
+function renderTable(list) {
+    const container = document.getElementById('paymentTableBody');
+    if (!container) return;
+    
+    if (list.length === 0) {
+        container.innerHTML = '<tr><td colspan="7" class="text-center py-5 text-muted">No students found.</td></tr>';
         return;
     }
 
-    container.innerHTML = filtered.map((item, i) => {
-        const balance = item.total_amount - item.paid_amount;
-        const progress = item.total_amount > 0 ? (item.paid_amount / item.total_amount) * 100 : 0;
-        
-        return `
-        <div class="card stagger" style="animation-delay: ${i * 0.05}s">
-            <div class="d-flex justify-content-between align-items-start mb-3">
-                <div>
-                    <h5 class="mb-0 fw-bold">${item.student_id.name}</h5>
-                    <small class="text-muted">${item.student_id.group_name}</small>
-                </div>
-                <span class="badge ${item.status === 'paid' ? 'bg-success' : 'bg-warning'}">${item.status}</span>
-            </div>
-            
-            <div class="payment-details mb-3">
-                <div class="d-flex justify-content-between small mb-1">
-                    <span>Paid: <strong>${item.paid_amount} MAD</strong></span>
-                    <span>Total: ${item.total_amount} MAD</span>
-                </div>
-                <div class="progress mb-2" style="height: 6px; background: rgba(255,255,255,0.1);">
-                    <div class="progress-bar ${balance <= 0 ? 'bg-success' : 'bg-primary'}" role="progressbar" style="width: ${progress}%"></div>
-                </div>
-                <div class="text-end small">
-                    <span class="${balance > 0 ? 'text-danger fw-bold' : 'text-success'}">
-                        ${balance > 0 ? `Remaining: ${balance} MAD` : 'Fully Paid'}
-                    </span>
-                </div>
-            </div>
+    const fragment = document.createDocumentFragment();
+    list.forEach((s, i) => {
+        const tr = document.createElement('tr');
+        tr.className = 'payment-row';
+        tr.style.animationDelay = `${i * 45}ms`;
+        tr.dataset.studentId = s.student_id;
 
-            <div class="d-flex gap-2">
-                <button class="btn btn-primary btn-sm flex-grow-1" onclick="openPayModal(${item.student_id.id}, '${item.student_id.name}', ${item.total_amount}, ${item.paid_amount})">
-                    <i class="fas fa-coins me-1"></i> Update Payment
-                </button>
-                <button class="btn btn-outline-secondary btn-sm" onclick="viewHistory(${item.student_id.id})" title="View History">
-                    <i class="fas fa-history"></i>
-                </button>
-            </div>
-        </div>
-    `}).join('');
+        const balance = s.amount_due - s.amount_paid;
+        const balanceClass = balance > 0 ? 'balance-cell has-deficit' : 'balance-cell cleared';
+        const balanceText = balance > 0 ? `${balance.toFixed(2)} MAD` : 'Cleared';
+
+        let statusClass = 'pending';
+        let statusIcon = 'clock';
+        if (s.status === 'paid') { statusClass = 'paid'; statusIcon = 'check-circle'; }
+        else if (s.status === 'partial') { statusClass = 'partial'; statusIcon = 'adjust'; }
+
+        tr.innerHTML = `
+            <td class="fw-bold">${s.name}</td>
+            <td><span class="badge bg-light text-dark border">${s.group_name}</span></td>
+            <td>${s.amount_due} MAD</td>
+            <td>
+                <input type="number" class="form-control form-control-sm text-end" value="${s.amount_paid}" style="width: 100px;">
+            </td>
+            <td class="${balanceClass}">${balanceText}</td>
+            <td>
+                <span class="status-badge ${statusClass}">
+                    <i class="fas fa-${statusIcon}"></i> ${s.status}
+                </span>
+            </td>
+            <td>
+                <div class="d-flex gap-1">
+                    <button class="btn btn-sm btn-primary btn-record">Record</button>
+                    <button class="btn btn-sm btn-outline-secondary" data-student-id="${s.student_id}" data-student-name="${s.name}">
+                        <i class="fas fa-history"></i>
+                    </button>
+                </div>
+            </td>
+        `;
+        fragment.appendChild(tr);
+    });
+    container.innerHTML = '';
+    container.appendChild(fragment);
 }
 
-async function viewHistory(studentId) {
-    const modal = document.getElementById('historyModal');
-    const content = document.getElementById('historyContent');
-    modal.classList.remove('hidden');
-    content.innerHTML = '<p class="text-center py-4">Loading history...</p>';
+function updateSummary(list) {
+    const summary = list.reduce((acc, s) => {
+        acc[s.status]++;
+        acc.total++;
+        return acc;
+    }, { paid: 0, partial: 0, pending: 0, total: 0 });
 
-    try {
-        const res = await apiFetch(`/payments/history/${studentId}`);
-        const history = await res.json();
-        
-        if (history.length === 0) {
-            content.innerHTML = '<div class="d-flex justify-content-between"><h4>Payment History</h4><button onclick="closeModal()" class="btn-close btn-close-white"></button></div><p class="text-muted">No history found.</p>';
-        } else {
-            content.innerHTML = `
-                <div class="d-flex justify-content-between mb-4">
-                    <h4 class="mb-0">Payment History</h4>
-                    <button onclick="closeModal()" class="btn-close btn-close-white"></button>
-                </div>
-                <div class="table-responsive">
-                    <table class="table table-dark table-hover">
-                        <thead><tr><th>Period</th><th>Status</th><th>Paid</th><th>Total</th></tr></thead>
-                        <tbody>
-                            ${history.map(h => `
-                                <tr>
-                                    <td>${getMonthName(h.month)} ${h.year}</td>
-                                    <td><span class="badge ${h.status === 'paid' ? 'bg-success' : 'bg-warning'}">${h.status}</span></td>
-                                    <td>${h.paid_amount} MAD</td>
-                                    <td>${h.total_amount} MAD</td>
-                                </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
-                </div>
-            `;
-        }
-    } catch (e) {
-        content.innerHTML = '<p class="text-danger">Error loading history.</p>';
+    document.getElementById('sumPaid').textContent = summary.paid;
+    document.getElementById('sumPartial').textContent = summary.partial;
+    document.getElementById('sumPending').textContent = summary.pending;
+    document.getElementById('sumTotal').textContent = summary.total;
+}
+
+function updateTabCounts(filiere, count) {
+    if (filiere === 'Développement Informatique') {
+        document.getElementById('count-di').textContent = count;
+    } else {
+        document.getElementById('count-sr').textContent = count;
     }
 }
 
-function getMonthName(m) {
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    return months[m-1];
-}
-
-function closeModal() {
-    document.getElementById('historyModal').classList.add('hidden');
-}
-
-function switchTab(tab) {
-    state.currentTab = tab;
-    document.querySelectorAll('#tabs button').forEach(b => {
-        b.classList.toggle('active', b.getAttribute('onclick').includes(tab));
+function renderFeeCards(fees) {
+    Object.keys(fees).forEach(f => {
+        const input = document.querySelector(`[data-fee-filiere="${CSS.escape(f)}"]`);
+        if (input) input.value = fees[f];
     });
-    render();
 }
 
-function renderSkeletons(count) {
-    document.getElementById('cardContainer').innerHTML = '<div class="text-center w-100 py-5 text-muted"><i class="fas fa-spinner fa-spin me-2"></i> Loading data...</div>';
+function renderHistoryModal(studentName, history) {
+    const content = document.getElementById('historyContent');
+    if (history.length === 0) {
+        content.innerHTML = '<div class="text-center py-4 text-muted">No payment records found.</div>';
+        return;
+    }
+
+    content.innerHTML = `
+        <div class="table-responsive">
+            <table class="table table-sm">
+                <thead>
+                    <tr><th>Period</th><th>Due</th><th>Paid</th><th>Status</th></tr>
+                </thead>
+                <tbody>
+                    ${history.map(h => {
+                        const mName = new Date(2000, h.month - 1).toLocaleString('en', { month: 'short' });
+                        return `
+                        <tr>
+                            <td>${mName} ${h.year}</td>
+                            <td>${h.amount_due}</td>
+                            <td class="fw-bold">${h.amount_paid}</td>
+                            <td><span class="status-badge ${h.status}" style="font-size:0.65rem;">${h.status}</span></td>
+                        </tr>`;
+                    }).join('')}
+                </tbody>
+            </table>
+        </div>
+    `;
 }
 
-function hideSkeletons() {}
+// ─── UTILS ───────────────────────────────────────────────────────────────────
+function updateInkBar() {
+    const activeTab = document.querySelector('.filiere-tab.active');
+    const bar = document.getElementById('tabInkBar');
+    if (!activeTab || !bar) return;
+    bar.style.left  = activeTab.offsetLeft + 'px';
+    bar.style.width = activeTab.offsetWidth + 'px';
+}
+
+function debounce(fn, delay) {
+    let timer;
+    return function(...args) {
+        clearTimeout(timer);
+        timer = setTimeout(() => fn.apply(this, args), delay);
+    };
+}
+
+// ─── ACTIONS ─────────────────────────────────────────────────────────────────
+async function loadStudents() {
+    state.loading = true;
+    renderSkeletons(5);
+    const wrapper = document.getElementById('paymentTableWrapper');
+    wrapper.style.opacity = '0.4';
+    
+    try {
+        const res = await fetchStudents(state.activeFiliere, state.month, state.year);
+        if (res && res.ok) {
+            const json = await res.json();
+            state.students = json.data || [];
+            state.filtered = state.searchQuery 
+                ? state.students.filter(s => s.name.toLowerCase().includes(state.searchQuery))
+                : [...state.students];
+            
+            renderTable(state.filtered);
+            updateSummary(state.filtered);
+            updateTabCounts(state.activeFiliere, state.students.length);
+            
+            wrapper.style.transition = 'opacity 280ms ease';
+            wrapper.style.opacity = '1';
+        } else {
+            showNotify('Failed to load students.', 'error');
+        }
+    } catch (e) {
+        console.error(e);
+        showNotify('Connection error.', 'error');
+    } finally {
+        hideSkeletons();
+        state.loading = false;
+    }
+}
+
+async function handleRecord(btn, studentId, filiere, month, year) {
+    const row = btn.closest('tr');
+    const input = row.querySelector('input[type="number"]');
+    const amountPaid = parseFloat(input.value);
+    
+    if (isNaN(amountPaid) || amountPaid < 0) {
+        showNotify('Enter a valid amount.', 'warning');
+        return;
+    }
+    
+    btn.classList.add('loading');
+    btn.textContent = '';
+
+    try {
+        const res = await recordPayment(studentId, filiere, month, year, amountPaid);
+        if (res && res.ok) {
+            btn.classList.remove('loading');
+            btn.classList.add('success');
+            btn.innerHTML = '<i class="fas fa-check me-1"></i> Saved';
+            setTimeout(() => {
+                btn.classList.remove('success');
+                btn.innerHTML = 'Record';
+            }, 2000);
+            await loadStudents();
+        } else {
+            throw new Error('Record failed');
+        }
+    } catch (e) {
+        btn.classList.remove('loading');
+        btn.innerHTML = 'Record';
+        showNotify('Failed to save payment.', 'error');
+    }
+}
+
+async function openHistoryModal(studentId, studentName) {
+    document.getElementById('historyStudentName').textContent = studentName;
+    document.getElementById('historyContent').innerHTML = '<div class="text-center py-4"><i class="fas fa-spinner fa-spin me-2"></i>Loading...</div>';
+    document.getElementById('historyModal').classList.remove('hidden');
+    
+    try {
+        const res = await fetchHistory(studentId);
+        if (res && res.ok) {
+            const json = await res.json();
+            renderHistoryModal(studentName, json.data || []);
+        } else {
+            document.getElementById('historyContent').innerHTML = '<div class="text-danger">Failed to load history.</div>';
+        }
+    } catch (e) {
+        document.getElementById('historyContent').innerHTML = '<div class="text-danger">Error fetching history.</div>';
+    }
+}
+
+// ─── INITIALIZATION ──────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', async () => {
+    // Set month picker to current month
+    const now = new Date();
+    const picker = document.getElementById('monthPicker');
+    if (picker) {
+        picker.value = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+    }
+
+    // Initial load
+    try {
+        const feesRes = await fetchFees();
+        if (feesRes && feesRes.ok) {
+            const json = await feesRes.json();
+            json.data.forEach(f => { state.fees[f.filiere] = f.monthly_fee; });
+            renderFeeCards(state.fees);
+        }
+        await loadStudents();
+    } catch (e) { console.error(e); }
+
+    requestAnimationFrame(updateInkBar);
+
+    // Tab switching
+    document.querySelectorAll('.filiere-tab').forEach(tab => {
+        tab.addEventListener('click', async () => {
+            document.querySelectorAll('.filiere-tab').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            state.activeFiliere = tab.dataset.filiere;
+            updateInkBar();
+            await loadStudents();
+        });
+    });
+
+    // Month/year picker
+    document.getElementById('monthPicker').addEventListener('change', async (e) => {
+        const [y, m] = e.target.value.split('-');
+        state.year  = parseInt(y);
+        state.month = parseInt(m);
+        await loadStudents();
+    });
+
+    // Search
+    document.getElementById('studentSearch').addEventListener('input', debounce(e => {
+        state.searchQuery = e.target.value.toLowerCase().trim();
+        state.filtered = state.students.filter(s => s.name.toLowerCase().includes(state.searchQuery));
+        renderTable(state.filtered);
+        updateSummary(state.filtered);
+    }, 300));
+
+    // Record and History buttons (delegation)
+    document.getElementById('paymentTableBody').addEventListener('click', e => {
+        const recordBtn = e.target.closest('.btn-record');
+        if (recordBtn) {
+            const row = recordBtn.closest('tr');
+            handleRecord(recordBtn, row.dataset.studentId, state.activeFiliere, state.month, state.year);
+            return;
+        }
+        
+        const histBtn = e.target.closest('[data-student-id]');
+        if (histBtn && histBtn.classList.contains('btn-outline-secondary')) {
+            openHistoryModal(histBtn.dataset.studentId, histBtn.dataset.studentName);
+        }
+    });
+
+    // Fee save buttons
+    document.getElementById('feeConfigSection').addEventListener('click', async e => {
+        const saveBtn = e.target.closest('.btn-save-fee');
+        if (!saveBtn) return;
+        
+        const filiere = saveBtn.dataset.filiere;
+        const input = document.querySelector(`[data-fee-filiere="${CSS.escape(filiere)}"]`);
+        const amount = parseFloat(input.value);
+        
+        if (isNaN(amount) || amount < 0) {
+            showNotify('Enter a valid fee amount.', 'warning');
+            return;
+        }
+
+        saveBtn.disabled = true;
+        const res = await saveFee(filiere, amount);
+        saveBtn.disabled = false;
+        
+        if (res && res.ok) {
+            state.fees[filiere] = amount;
+            showNotify(`Fee updated for ${filiere}.`);
+            await loadStudents(); // Refresh balance columns
+        } else {
+            showNotify('Failed to update fee.', 'error');
+        }
+    });
+
+    // History modal close
+    document.getElementById('closeHistoryModal').addEventListener('click', () => {
+        document.getElementById('historyModal').classList.add('hidden');
+    });
+
+    window.addEventListener('resize', updateInkBar);
+});
+
+})();
