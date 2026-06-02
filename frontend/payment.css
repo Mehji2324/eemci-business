@@ -55,7 +55,7 @@
 
 .filiere-tab.active .tab-count {
     background: var(--primary);
-    color: #fff;
+    color: #050000;
 }
 
 /* Table Row Staggered Entry Animation */
@@ -101,6 +101,28 @@
     font-weight: 700;
     letter-spacing: 0.03em;
     text-transform: uppercase;
+}
+
+/* Enhanced Table Header for High Contrast */
+#paymentTable thead th {
+    color: #111827 !important;
+    background-color: #f8fafc !important;
+    font-weight: 800 !important;
+    border-top: 1px solid #e2e8f0 !important;
+    border-bottom: 2px solid #e2e8f0 !important;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+}
+
+#paymentTable thead th:first-child {
+    border-left: 1px solid #e2e8f0 !important;
+    border-radius: 12px 0 0 12px;
+}
+
+#paymentTable thead th:last-child {
+    border-right: 1px solid #e2e8f0 !important;
+    border-radius: 0 12px 12px 0;
 }
 
 .status-badge.paid    { background: rgba(16,185,129,0.15); color: #10b981; }

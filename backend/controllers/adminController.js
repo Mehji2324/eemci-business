@@ -68,12 +68,12 @@ exports.addUser = asyncHandler(async (req, res) => {
         if (role === 'student') {
             await connection.execute(
                 'INSERT INTO students_info (user_id, group_name, department, academic_email) VALUES (?, ?, ?, ?)',
-                [userId, group_name, department || 'Développement Informatique', academicEmail]
+                [userId, group_name, department || 'Developpement Informatique', academicEmail]
             );
         } else if (role === 'professor') {
             await connection.execute(
                 'INSERT INTO professors_info (user_id, academic_email, department) VALUES (?, ?, ?)',
-                [userId, academicEmail, department || 'Développement Informatique']
+                [userId, academicEmail, department || 'Developpement Informatique']
             );
         }
 

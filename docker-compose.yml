@@ -11,7 +11,8 @@ services:
     ports:
       - "3307:3306"
     volumes:
-      - ./database/eemci.sql:/docker-entrypoint-initdb.d/init.sql:Z
+      - ./database/eemci.sql:/docker-entrypoint-initdb.d/01-eemci.sql:Z
+      - ./database/seed_professors.sql:/docker-entrypoint-initdb.d/02-seed_professors.sql:Z
       - mysql_data:/var/lib/mysql:Z
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot_password"]
@@ -37,6 +38,17 @@ services:
     depends_on:
       db:
         condition: service_healthy
+
+  frontend:
+    build: ./frontend
+    container_name: eemci_frontend
+    restart: always
+    ports:
+      - "8080:80"
+    volumes:
+      - ./frontend:/usr/share/nginx/html:Z
+    depends_on:
+      - backend
 
 volumes:
   mysql_data:

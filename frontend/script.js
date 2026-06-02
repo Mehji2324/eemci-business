@@ -344,20 +344,29 @@ function updateStudentStats(grades, courses, events) {
         : 'N/A';
     
     statsEl.innerHTML = `
-        <div class="stat-card glass">
-            <i class="fas fa-book-open fa-2x mb-2 text-primary"></i>
-            <h4>Courses</h4>
-            <div class="value">${courses.length}</div>
+        <div class="stat-card tilt-card glass" style="position:relative;">
+            <div class="card-shine"></div>
+            <div class="tilt-inner">
+                <i class="fas fa-book-open fa-2x mb-2 text-primary"></i>
+                <h4>Courses</h4>
+                <div class="value">${courses.length}</div>
+            </div>
         </div>
-        <div class="stat-card glass">
-            <i class="fas fa-star fa-2x mb-2 text-warning"></i>
-            <h4>Avg. Grade</h4>
-            <div class="value">${avg}/20</div>
+        <div class="stat-card tilt-card glass" style="position:relative;">
+            <div class="card-shine"></div>
+            <div class="tilt-inner">
+                <i class="fas fa-star fa-2x mb-2 text-warning"></i>
+                <h4>Avg. Grade</h4>
+                <div class="value">${avg}/20</div>
+            </div>
         </div>
-        <div class="stat-card glass">
-            <i class="fas fa-calendar-day fa-2x mb-2 text-success"></i>
-            <h4>Events</h4>
-            <div class="value">${events.length}</div>
+        <div class="stat-card tilt-card glass" style="position:relative;">
+            <div class="card-shine"></div>
+            <div class="tilt-inner">
+                <i class="fas fa-calendar-day fa-2x mb-2 text-success"></i>
+                <h4>Events</h4>
+                <div class="value">${events.length}</div>
+            </div>
         </div>
     `;
 }
@@ -705,8 +714,22 @@ async function loadAdminData() {
             const statsCards = document.getElementById('statsCards');
             if (statsCards) {
                 statsCards.innerHTML = `
-                    <div class="col-md-4"><div class="stat-card glass p-3 text-center"><h4>Users</h4><div class="h2">${stats.users}</div></div></div>
-                    <div class="col-md-4"><div class="stat-card glass p-3 text-center"><h4>Courses</h4><div class="h2">${stats.courses}</div></div></div>
+                    <div class="col-md-4">
+                        <div class="stat-card tilt-card glass p-3 text-center" style="position:relative;">
+                            <div class="card-shine"></div>
+                            <div class="tilt-inner">
+                                <h4>Users</h4><div class="h2">${stats.users}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="stat-card tilt-card glass p-3 text-center" style="position:relative;">
+                            <div class="card-shine"></div>
+                            <div class="tilt-inner">
+                                <h4>Courses</h4><div class="h2">${stats.courses}</div>
+                            </div>
+                        </div>
+                    </div>
                 `;
             }
         }

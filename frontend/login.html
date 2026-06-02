@@ -1,70 +1,189 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EEMCI - Connexion Portail</title>
-    <script src="theme-init.js"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <title>EEMCI Platform - Login</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <link rel="stylesheet" href="style.css">
+    
     <style>
-        body {
-            background: #020617;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        /* Setup l-khlfiya general */
+        body.auth-page {
+            background: #0b0f19;
             min-height: 100vh;
-            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             overflow: hidden;
+            perspective: 1000px; /* Ka t3ti l-3omq l-fdaye3 dial 3D */
+            font-family: 'Segoe UI', system-ui, sans-serif;
         }
-        .ambient-glow {
-            position: fixed;
-            width: 600px;
-            height: 600px;
-            background: radial-gradient(circle, rgba(79, 70, 229, 0.1) 0%, transparent 70%);
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: -1;
-            filter: blur(80px);
+
+        /* L-m7war fine kaydor l-box */
+        .login-container {
+            width: 100%;
+            max-width: 420px;
+            padding: 20px;
+            transform-style: preserve-3d;
+        }
+
+        /* Box dial Login Glassmorphism 3D */
+        .login-box {
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            text-align: center;
+            
+            /* S7r dial preserve-3d bch l-3ناصر dakhlyin yit3zlo */
+            transform-style: preserve-3d;
+            transform: rotateX(0deg) rotateY(0deg);
+            transition: transform 0.1s ease-out, box-shadow 0.3s ease;
+            will-change: transform;
+        }
+
+        /* Floating effect dynamic dial shadow */
+        .login-box:hover {
+            box-shadow: 0 40px 80px rgba(0, 102, 255, 0.15), 
+                        0 0 40px rgba(255, 255, 255, 0.02);
+        }
+
+        /* Tdfa3 l-foq dial l-3ناصر dakhlyin (3D Layers) */
+        .login-logo {
+            max-width: 90px;
+            margin-bottom: 20px;
+            transform: translateZ(50px); /* kharja l-gdam */
+            filter: drop-shadow(0 10px 15px rgba(0,0,0,0.3));
+            transition: transform 0.3s ease;
+        }
+
+        h1 {
+            color: #ffffff;
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+            transform: translateZ(40px);
+        }
+
+        .login-box p {
+            color: #64748b;
+            font-size: 0.95rem;
+            transform: translateZ(30px);
+        }
+
+        form {
+            margin-top: 25px;
+            transform: translateZ(35px);
+        }
+
+        /* Inputs design dynamic */
+        input[type="email"], 
+        input[type="password"] {
+            width: 100%;
+            padding: 14px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: #fff;
+            font-size: 0.95rem;
+            margin-bottom: 16px;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        input:focus {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: #3b82f6;
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.25);
+        }
+
+        /* Button 3D Pro */
+        button[type="submit"] {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(37, 99, 243, 0.3);
+            transition: all 0.3s ease;
+            transform: translateZ(45px); /* Button overlay tban high depth */
+        }
+
+        button[type="submit"]:hover {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            box-shadow: 0 8px 25px rgba(37, 99, 243, 0.5);
+            transform: translateZ(55px) scale(1.02);
+        }
+
+        #loginError {
+            transform: translateZ(20px);
+            font-size: 0.85rem;
+            font-weight: 500;
         }
     </style>
 </head>
-<body>
-    <div class="ambient-glow"></div>
-    
-    <div class="login-box">
-        <div class="text-center">
+<body class="auth-page">
+
+    <div class="login-container" id="scene" style="pointer-events: none;">
+        <div class="login-box" id="card" style="pointer-events: auto;">
             <img src="logo.webp" alt="EEMCI Logo" class="login-logo">
-            <h1>Bienvenue</h1>
-            <p>Accédez à votre espace étudiant ou professionnel</p>
-        </div>
-
-        <form id="loginForm">
-            <div class="input-group-custom">
-                <i class="fas fa-envelope"></i>
-                <input type="email" id="email" placeholder="Email Académique" required>
-            </div>
+            <h1>EEMCI Platform</h1>
+            <p>School Management System</p>
             
-            <div class="input-group-custom">
-                <i class="fas fa-lock"></i>
-                <input type="password" id="password" placeholder="Mot de passe" required>
-            </div>
-
-            <button type="submit" class="btn-login">
-                Se Connecter <i class="fas fa-arrow-right ms-2"></i>
-            </button>
-        </form>
-
-        <div class="text-center mt-4">
-            <a href="index.html" class="text-muted text-decoration-none small">
-                <i class="fas fa-chevron-left me-1"></i> Retour à l'accueil
-            </a>
+            <form id="loginForm">
+                <input type="email" id="email" placeholder="Email" required>
+                <input type="password" id="password" placeholder="Password" required>
+                <button type="submit">Login</button>
+            </form>
+            
+            <p id="loginError" style="color: #ef4444; margin-top: 1rem;"></p>
         </div>
     </div>
 
+    <!-- Scripts l-asasiya dialek -->
+    <script src="app-core.js"></script>
     <script src="script.js"></script>
+
+    <!-- Script tracking dial l-mouse interactive 3D -->
+    <script>
+        const scene = document.getElementById('scene');
+        const card = document.getElementById('card');
+
+        scene.addEventListener('mousemove', (e) => {
+            const rect = scene.getBoundingClientRect();
+            
+            // 7isab l-markaz dial l-card
+            const x = e.clientX - rect.left - (rect.width / 2);
+            const y = e.clientY - rect.top - (rect.height / 2);
+            
+            // T7did zawiyat l-doran (max 20 deg bch tbqa pro)
+            const degX = -(y / (rect.height / 2)) * 20;
+            const degY = (x / (rect.width / 2)) * 20;
+            
+            // Tatbiq l-3D rotation inline
+            card.style.transform = `rotateX(${degX}deg) rotateY(${degY}deg)`;
+        });
+
+        // Rj3 l-card l-blasthom mli l-mouse tkhrej
+        scene.addEventListener('mouseleave', () => {
+            card.style.transform = 'rotateX(0deg) rotateY(0deg)';
+            card.style.transition = 'transform 0.5s ease';
+        });
+
+        scene.addEventListener('mouseenter', () => {
+            card.style.transition = 'none'; // Bch tkon l-7raka instantaneous m3a l-maws
+        });
+    </script>
 </body>
 </html>

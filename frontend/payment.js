@@ -12,11 +12,11 @@ if (!_token || !_user || _user.role !== 'admin') {
 
 // ─── STATE ───────────────────────────────────────────────────────────────────
 const state = {
-    activeFiliere: 'Développement Informatique',
+    activeFiliere: 'Developpement Informatique',
     month: new Date().getMonth() + 1,        // 1-12
     year:  new Date().getFullYear(),
     searchQuery: '',
-    fees: {},            // { 'Développement Informatique': 1500, ... }
+    fees: {},            // { 'Developpement Informatique': 1500, ... }
     students: [],        // raw list for current filiere/month/year
     filtered: [],        // after search filter
     loading: false
@@ -133,7 +133,7 @@ function updateSummary(list) {
 }
 
 function updateTabCounts(filiere, count) {
-    if (filiere === 'Développement Informatique') {
+    if (filiere === 'Developpement Informatique') {
         document.getElementById('count-di').textContent = count;
     } else {
         document.getElementById('count-sr').textContent = count;
