@@ -660,8 +660,8 @@ async function loadAdminData() {
                     <td><span class="badge bg-secondary">${u.role}</span></td>
                     <td>
                         <div class="input-group input-group-sm" style="max-width: 150px;">
-                            <input type="password" class="form-control border-0 bg-transparent" value="${u.raw_password || '********'}" readonly id="pwd-${u.id}">
-                            <button class="btn btn-outline-secondary border-0" type="button" onclick="togglePwdVisibility(${u.id})">
+                            <input type="password" class="form-control border-0 bg-transparent admin-pwd-input" value="${u.raw_password || '********'}" readonly id="pwd-${u.id}">
+                            <button class="btn btn-outline-secondary border-0 admin-pwd-toggle" type="button" onclick="togglePwdVisibility(${u.id})">
                                 <i class="fas fa-eye" id="eye-${u.id}"></i>
                             </button>
                         </div>

@@ -496,6 +496,15 @@ input:focus, select:focus, textarea:focus {
     color: #475569 !important;
 }
 
+/* Admin User Management Password Styles */
+.admin-pwd-input, #password, #userPassword {
+    color: #000000 !important;
+}
+
+.admin-pwd-toggle, #togglePassword, .admin-pwd-toggle i, #togglePassword i {
+    color: #000000 !important;
+}
+
 /* Utilities */
 .hidden { display: none !important; }
 .glass { background: var(--glass-bg); backdrop-filter: blur(10px); border: 1px solid var(--glass-border); }
