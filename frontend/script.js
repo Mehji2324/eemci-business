@@ -296,6 +296,7 @@ async function initDashboard(user) {
             menu.innerHTML = `
                 <li onclick="switchStudentSection('studentOverview', this)" class="active"><i class="fas fa-user"></i> Overview</li>
                 <li onclick="switchStudentSection('studentGrades', this)"><i class="fas fa-graduation-cap"></i> My Grades</li>
+                <li onclick="switchStudentSection('studentPayments', this)"><i class="fas fa-file-invoice-dollar"></i> My Payments</li>
                 <li onclick="switchStudentSection('studentCourses', this)"><i class="fas fa-book"></i> My Courses</li>
                 <li onclick="switchStudentSection('studentStudySchedule', this)"><i class="fas fa-calendar-alt"></i> Study Plan</li>
                 <li onclick="switchStudentSection('studentExamSchedule', this)"><i class="fas fa-file-alt"></i> Exam Plan</li>
@@ -335,7 +336,7 @@ async function initDashboard(user) {
         }
     }
 }
-function updateStudentStats(grades, courses, events) {
+function updateStudentStats(grades, courses, events, payments = []) {
     const statsEl = document.getElementById('statsOverview');
     if (!statsEl) return;
 
@@ -343,6 +344,15 @@ function updateStudentStats(grades, courses, events) {
         ? (grades.reduce((acc, g) => acc + parseFloat(g.note), 0) / grades.length).toFixed(2)
         : 'N/A';
     
+    // Get latest payment status
+    let paymentStatus = 'No records';
+    let statusClass = 'text-muted';
+    if (payments.length > 0) {
+        const latest = payments[0]; // Assuming it's sorted by year/month DESC
+        paymentStatus = latest.status.toUpperCase();
+        statusClass = latest.status === 'paid' ? 'text-success' : latest.status === 'partial' ? 'text-warning' : 'text-danger';
+    }
+
     statsEl.innerHTML = `
         <div class="stat-card tilt-card glass" style="position:relative;">
             <div class="card-shine"></div>
@@ -366,6 +376,14 @@ function updateStudentStats(grades, courses, events) {
                 <i class="fas fa-calendar-day fa-2x mb-2 text-success"></i>
                 <h4>Events</h4>
                 <div class="value">${events.length}</div>
+            </div>
+        </div>
+        <div class="stat-card tilt-card glass" style="position:relative;">
+            <div class="card-shine"></div>
+            <div class="tilt-inner">
+                <i class="fas fa-credit-card fa-2x mb-2 text-info"></i>
+                <h4>Last Payment</h4>
+                <div class="value ${statusClass}" style="font-size: 1.4rem;">${paymentStatus}</div>
             </div>
         </div>
     `;
@@ -547,14 +565,17 @@ if (composeForm) {
 // ─── STUDENT FEATURES ────────────────────────────────────────────────────────
 async function loadStudentData(user) {
     try {
-        const [grades, courses, events, studySchedule, examSchedule, profile] = await Promise.all([
+        const [grades, courses, events, studySchedule, examSchedule, profile, paymentsData] = await Promise.all([
             apiFetch('/student/grades').then(r => r ? r.json() : []),
             apiFetch('/student/courses').then(r => r ? r.json() : []),
             apiFetch('/student/events').then(r => r ? r.json() : []),
             apiFetch('/student/schedule?type=study').then(r => r ? r.json() : []),
             apiFetch('/student/schedule?type=exam').then(r => r ? r.json() : []),
-            apiFetch('/student/profile').then(r => r ? r.json() : null)
+            apiFetch('/student/profile').then(r => r ? r.json() : null),
+            apiFetch('/payments/my-history').then(r => r ? r.json() : { data: [] })
         ]);
+
+        const payments = paymentsData.data || [];
 
         // Profile Display
         if (profile) {
@@ -566,7 +587,8 @@ async function loadStudentData(user) {
         }
         if (document.getElementById('studentEmailDisplay')) document.getElementById('studentEmailDisplay').textContent = user.email;
 
-        updateStudentStats(grades, courses, events);
+        updateStudentStats(grades, courses, events, payments);
+        renderStudentPayments(payments);
 
         // Grades table
         const gTable = document.querySelector('#gradesTable tbody');
@@ -621,6 +643,39 @@ async function loadStudentData(user) {
             `).join('') : '<p class="text-center w-100">No upcoming events or plans.</p>';
         }
     } catch (err) { console.error('Student data error:', err); }
+}
+
+function renderStudentPayments(payments) {
+    const pTable = document.querySelector('#paymentsTable tbody');
+    if (!pTable) return;
+
+    const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+    if (payments.length === 0) {
+        pTable.innerHTML = '<tr><td colspan="5" class="text-center">No payment history found.</td></tr>';
+        return;
+    }
+
+    pTable.innerHTML = payments.map(p => `
+        <tr>
+            <td>${months[p.month - 1]} ${p.year}</td>
+            <td>${p.amount_due} DH</td>
+            <td>${p.amount_paid} DH</td>
+            <td><span class="badge ${p.status === 'paid' ? 'bg-success' : p.status === 'partial' ? 'bg-warning' : 'bg-danger'}">${p.status.toUpperCase()}</span></td>
+            <td>${p.paid_at ? new Date(p.paid_at).toLocaleDateString() : '---'}</td>
+        </tr>
+    `).join('');
+}
+
+async function loadStudentPayments() {
+    try {
+        const res = await apiFetch('/payments/my-history');
+        if (!res) return;
+        const result = await res.json();
+        renderStudentPayments(result.data || []);
+    } catch (err) {
+        console.error('Error loading payments:', err);
+    }
 }
 
 // ─── PROFESSOR FEATURES ──────────────────────────────────────────────────────

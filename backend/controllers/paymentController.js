@@ -76,3 +76,12 @@ exports.getStudentHistory = asyncHandler(async (req, res) => {
     const history = await Payment.getPaymentHistory(studentId);
     res.json({ success: true, data: history });
 });
+
+/**
+ * GET /api/payments/my-history
+ * Returns payment history for the currently logged-in student
+ */
+exports.getMyHistory = asyncHandler(async (req, res) => {
+    const history = await Payment.getPaymentHistory(req.user.id);
+    res.json({ success: true, data: history });
+});
